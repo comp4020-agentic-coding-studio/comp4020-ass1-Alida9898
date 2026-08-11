@@ -160,3 +160,21 @@ catching you out, a fact about the stack the agent keeps getting wrong --- write
 it down here. Growing this file is the work of harness engineering, and the gap
 between this boilerplate and your own version is part of what your prototype
 says about the developer you're becoming.
+
+## Commit as each piece of work finishes, not at the end of a session
+
+Crit 1 nearly shipped with nothing real behind it: a whole Windows 98 re-skin
+was built, checked with `pnpm check`, and confirmed in the browser across many
+turns of back-and-forth --- but never once committed. Because the last real
+commit predated all of it, `git status -sb` showed the local branch level with
+`origin/main`, which reads as "everything's pushed" even though what was
+pushed was a bare stub. A tutor's automated nudge is what caught it, not a
+local check.
+
+So: after any turn that leaves the working tree passing `pnpm check` with a
+real, reviewed change in it, commit before moving to the next request --- don't
+wait for a natural stopping point, because "the session's about to end" isn't
+a signal available until the deadline is already close. Before treating a
+session as wrapped, run `git status -sb` and `git log --oneline @{upstream}..HEAD`
+and confirm there's nothing sitting uncommitted, not just that the working
+tree is clean.
