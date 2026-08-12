@@ -51,8 +51,15 @@ export const SPEED_OF_SOUND = 343;
 /** Directional gain falloff, dB per radian squared. */
 export const ILD_GAIN = 6.6;
 
-/** A strike counts as a hit inside this normalised distance. */
-export const HIT_RADIUS = 0.18;
+/**
+ * A strike counts as a hit inside this normalised distance.
+ *
+ * Tuned against the two modes rather than for comfort. Uneven ears let you read
+ * a position straight off the gauges, so a tight target still lands every time;
+ * levelled ears leave you guessing along one axis, and a tight target is what
+ * stops that guess from paying off often enough to blunt the point.
+ */
+export const HIT_RADIUS = 0.09;
 
 // Both ears sit on opposite sides of the head, so both keep a lateral aim in
 // every mode. Only the ELEVATION aims differ, and that difference is the thing
@@ -124,44 +131,62 @@ export function ild(prey: Point, ears: EarConfig): number {
   return earLevel(prey, ears.right) - earLevel(prey, ears.left);
 }
 
-/** The widest timing difference the field can produce, for use as a full scale. */
-export function timingFullScale(): number {
-  return Math.abs(itd({ x: 1, y: 0 }));
+/**
+ * What a listener can work out about where a sound came from, from nothing but
+ * what its own two ears report.
+ *
+ * This is the thing the page is actually about, so it is a function and not a
+ * paragraph. An owl does not sweep its aim around hunting for a match — it hears
+ * the sound once, works out a direction, and strikes. So the page has to be able
+ * to show a direction, which means being able to compute one.
+ */
+export interface Inference {
+  /** How far across, -1..1. Recoverable from the timing difference alone. */
+  readonly across: number;
+  /**
+   * How high, -1..1 — or null when this pair of ears cannot resolve height at
+   * all. Null is not a failure to compute: see resolvesHeight below.
+   */
+  readonly high: number | null;
 }
 
-/** The widest loudness difference this pair of ears can produce over the field. */
-export function loudnessFullScale(ears: EarConfig): number {
-  const corners: Point[] = [
-    { x: 1, y: 1 },
-    { x: 1, y: -1 },
-    { x: -1, y: 1 },
-    { x: -1, y: -1 },
-  ];
-  return Math.max(...corners.map((corner) => Math.abs(ild(corner, ears))));
+/** Below this, the loudness difference does not respond to height at all. */
+const HEIGHT_FLOOR = 1e-9;
+
+/**
+ * How much the loudness difference moves per unit of height.
+ *
+ * ild is linear in azimuth and elevation, so this is exact rather than a
+ * gradient estimate — and levelling the ears sends it to exactly zero, which is
+ * why height stops being recoverable rather than merely getting noisy.
+ */
+export function loudnessPerHeight(ears: EarConfig): number {
+  return ild({ x: 0, y: 1 }, ears) - ild({ x: 0, y: 0 }, ears);
 }
 
-// A reading normalised to roughly -1..1 puts both cues on one scale, so "these
-// two readings agree" means the same thing to the gauge on screen and to the
-// tests. Two definitions of matched would eventually disagree, and the one on
-// screen is the one the visitor would believe.
-
-export function timingReading(point: Point): number {
-  return itd(point) / timingFullScale();
+/** Whether this pair of ears can resolve height at all. */
+export function resolvesHeight(ears: EarConfig): boolean {
+  return Math.abs(loudnessPerHeight(ears)) > HEIGHT_FLOOR;
 }
 
-export function loudnessReading(point: Point, ears: EarConfig): number {
-  return ild(point, ears) / loudnessFullScale(ears);
-}
+export function infer(source: Point, ears: EarConfig): Inference {
+  // Across comes straight out of the timing difference: invert the sine.
+  const sine = (itd(source) * SPEED_OF_SOUND) / HEAD_WIDTH;
+  const across = Math.asin(Math.min(1, Math.max(-1, sine))) / MAX_AZIMUTH;
 
-/** How close two normalised readings must be to count as lined up. */
-export const CUE_TOLERANCE = 0.06;
+  const perHeight = loudnessPerHeight(ears);
+  if (Math.abs(perHeight) <= HEIGHT_FLOOR) {
+    // Two equations, and the height term has dropped out of the second one.
+    // There is no height to report — not an imprecise one, none.
+    return { across, high: null };
+  }
 
-export function timingAgrees(aim: Point, prey: Point): boolean {
-  return Math.abs(timingReading(prey) - timingReading(aim)) <= CUE_TOLERANCE;
-}
-
-export function loudnessAgrees(aim: Point, prey: Point, ears: EarConfig): boolean {
-  return Math.abs(loudnessReading(prey, ears) - loudnessReading(aim, ears)) <= CUE_TOLERANCE;
+  // Otherwise solve the loudness equation for height, given the across we just
+  // recovered. ild is linear, so the coefficients are differences.
+  const atOrigin = ild({ x: 0, y: 0 }, ears);
+  const perAcross = ild({ x: 1, y: 0 }, ears) - atOrigin;
+  const high = (ild(source, ears) - atOrigin - perAcross * across) / perHeight;
+  return { across, high };
 }
 
 export function distance(a: Point, b: Point): number {

@@ -4,12 +4,13 @@ import {
   HIT_RADIUS,
   MAX_AZIMUTH,
   ild,
+  infer,
   isHit,
   itd,
   itdMicroseconds,
-  loudnessAgrees,
+  loudnessPerHeight,
   type Point,
-  timingAgrees,
+  resolvesHeight,
 } from "../acoustics";
 
 // This week's spec, as tests. The published brief asks for a core interaction
@@ -128,53 +129,62 @@ describe("a strike either lands or it does not", () => {
   });
 });
 
-// The visitor's actual task is to move their aim until both readings line up with
-// what they are hearing. So the sharpest form of this page's claim is about what
-// lining both up is WORTH: with uneven ears it pins the prey down, and with
-// levelled ears the instruments can agree while the aim is still wildly wrong.
-describe("lining both readings up is what pins the prey down", () => {
-  const prey: Point = { x: 0.4, y: 0.55 };
+// The page is really about what the two ears let you WORK OUT. A barn owl does
+// not sweep its aim around hunting for a match — it hears the sound once, works
+// out a direction, and strikes. So the sharp claim is about the inference, and it
+// is sharper than "less accurate": levelling the ears does not make height
+// imprecise, it takes height away.
+describe("what the two ears let you work out", () => {
+  const acrossSamples = samples(9);
+  const highSamples = samples(9);
 
-  /** Every aim the visitor could plausibly settle on. */
-  const grid: Point[] = samples(41).flatMap((x) => samples(41).map((y) => at(x, y)));
-
-  function agreeingAims(mode: "uneven" | "level"): Point[] {
-    return grid.filter(
-      (candidate) =>
-        timingAgrees(candidate, prey) && loudnessAgrees(candidate, prey, EAR_MODES[mode]),
-    );
-  }
-
-  it("leaves only one place to be when the ears are uneven", () => {
-    const aims = agreeingAims("uneven");
-    expect(aims.length, "no aim satisfied both cues; the task would be impossible").toBeGreaterThan(
-      0,
-    );
-    for (const candidate of aims) {
-      expect(
-        isHit(candidate, prey),
-        `both readings agreed at (${candidate.x.toFixed(2)}, ${candidate.y.toFixed(2)}) but the strike would miss prey at (${prey.x}, ${prey.y}); uneven ears must make a matched aim a correct aim`,
-      ).toBe(true);
+  it("recovers the exact position from uneven ears, anywhere in the field", () => {
+    for (const x of acrossSamples) {
+      for (const y of highSamples) {
+        const worked = infer(at(x, y), EAR_MODES.uneven);
+        expect(worked.across).toBeCloseTo(x, 6);
+        expect(
+          worked.high,
+          `uneven ears reported no height for (${x}, ${y}); height must be recoverable everywhere`,
+        ).not.toBeNull();
+        expect(worked.high ?? Number.NaN).toBeCloseTo(y, 6);
+      }
     }
   });
 
-  it("leaves the whole height of the field open when the ears are levelled", () => {
-    const aims = agreeingAims("level");
-    const heights = aims.map((candidate) => candidate.y);
-    const spread = Math.max(...heights) - Math.min(...heights);
-    expect(
-      spread,
-      `levelled ears narrowed the matching aims to ${spread.toFixed(2)} of the field's height; the vertical must be left entirely free`,
-    ).toBeGreaterThan(1.5);
+  it("still recovers left-right from levelled ears", () => {
+    for (const x of acrossSamples) {
+      expect(
+        infer(at(x, 0.7), EAR_MODES.level).across,
+        "levelling the ears costs height, not direction; the timing cue is untouched",
+      ).toBeCloseTo(x, 6);
+    }
   });
 
-  it("lets the instruments agree and the strike miss anyway", () => {
-    const aims = agreeingAims("level");
-    const misses = aims.filter((candidate) => !isHit(candidate, prey));
+  // The claim the whole page rests on, in its strongest form.
+  it("cannot report a height from levelled ears at any height", () => {
+    for (const y of highSamples) {
+      expect(
+        infer(at(0.3, y), EAR_MODES.level).high,
+        `levelled ears produced a height for y=${y}; there is no height to produce, and reporting one would be a lie the page is built on disproving`,
+      ).toBeNull();
+    }
+  });
+
+  it("puts that fact in the model, so callers do not have to discover it", () => {
+    expect(resolvesHeight(EAR_MODES.uneven)).toBe(true);
+    expect(resolvesHeight(EAR_MODES.level)).toBe(false);
+  });
+
+  it("loses height because the coefficient is exactly zero, not merely small", () => {
     expect(
-      misses.length / aims.length,
-      "most aims that satisfy both levelled readings should still miss — that gap is the entire argument of the page",
-    ).toBeGreaterThan(0.5);
+      Math.abs(loudnessPerHeight(EAR_MODES.uneven)),
+      "uneven ears must move the loudness difference by a readable amount per unit of height",
+    ).toBeGreaterThan(1);
+    expect(
+      loudnessPerHeight(EAR_MODES.level),
+      "a small-but-nonzero coefficient would mean height was merely hard to read; it has to be absent",
+    ).toBeCloseTo(0, 12);
   });
 });
 

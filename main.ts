@@ -1,16 +1,17 @@
 // Rendering and input for the hunt. All the arithmetic lives in acoustics.ts,
-// which is pure so spec/hunt.test.ts can hold it to account; this file only
-// turns numbers into pixels and events into numbers.
+// which is pure so spec/hunt.test.ts can hold it to account; this file only turns
+// numbers into pixels and events into numbers.
 //
-// Each gauge shows two things: what the owl is HEARING (the target) and what it
-// WOULD hear from where it is currently aiming (the needle). The task is to line
-// them up, which needs no units and no arithmetic — and is what a barn owl is
-// doing when it turns its head towards a sound. Note that reading the aim's cues
-// took no new model code: itd() and ild() were always functions of an arbitrary
-// point, so the pure split paid for itself here.
+// The two gauges share the field's own axes — one along the bottom for how far
+// across, one up the side for how high — and each shows a ring where the ears say
+// the sound is, plus a dot where the aim currently is. That is a deliberate
+// change from an earlier version where the visitor moved their aim until two
+// readings matched: matching worked as a game but taught nothing, because you
+// never learn that a loudness difference IS a height, you just wiggle until it
+// agrees. An owl does not wiggle. It hears the sound once and drops.
 //
-// Positions are kept in normalised -1..1 coordinates and converted to pixels
-// only at paint time, which is what makes a resize mid-strike a non-event.
+// Positions are kept in normalised -1..1 coordinates and converted to pixels only
+// at paint time, which is what makes a resize mid-strike a non-event.
 
 import {
   EAR_MODES,
@@ -19,13 +20,10 @@ import {
   clampToField,
   distance,
   ild,
+  infer,
   isHit,
   itdMicroseconds,
-  loudnessAgrees,
-  loudnessReading,
   randomPrey,
-  timingAgrees,
-  timingReading,
 } from "./acoustics";
 
 /**
@@ -43,16 +41,16 @@ function need<T extends HTMLElement>(id: string): T {
 const field = need("field");
 const fieldAim = need("field-aim");
 const fieldPrey = need("field-prey");
-const targetTiming = need("target-timing");
-const needleTiming = need("needle-timing");
-const targetLoudness = need("target-loudness");
-const needleLoudness = need("needle-loudness");
+const gaugeV = need("gauge-v");
+const soundV = need("v-sound");
+const aimV = need("v-aim");
+const soundH = need("h-sound");
+const aimH = need("h-aim");
 const readTiming = need("read-timing");
 const readLoudness = need("read-loudness");
 const figureTiming = need("figure-timing");
 const figureLoudness = need("figure-loudness");
 const loudnessKind = need("loudness-kind");
-const lockLine = need("lock");
 const strikeButton = need<HTMLButtonElement>("strike");
 const status = need("status");
 
@@ -61,23 +59,15 @@ const scoreCells: Record<EarMode, { hits: HTMLElement; strikes: HTMLElement; rat
   level: { hits: need("level-hits"), strikes: need("level-strikes"), rate: need("level-rate") },
 };
 
-/** How far from centre a gauge marker can travel, in percent. */
-const GAUGE_SPAN = 42;
-
 /** How far one arrow-key press moves the aim. */
-const KEY_STEP = 0.05;
+const KEY_STEP = 0.04;
 
 /** How long the prey stays visible after a strike, in milliseconds. */
 const REVEAL_MS = 1400;
 
-// Each mode's readings are normalised against its own full scale, so the loudness
-// gauge fills its rail either way. Levelled ears swing over a smaller range in dB,
-// and that autoscaling is what keeps the meter looking every bit as alive as it
-// did before — which is the point being made. Flagged in the page footer.
-
 const LOUDNESS_KIND: Record<EarMode, string> = {
-  uneven: "each ear is deafest away from where it points",
-  level: "both ears now point the same way",
+  uneven: "from which ear hears it louder — the gauge up the side",
+  level: "both ears now point the same way, so this gauge has nothing to show",
 };
 
 interface Tally {
@@ -95,7 +85,6 @@ let prey: Point = randomPrey(Math.random);
 let aim: Point = { x: 0, y: 0 };
 let revealing = false;
 let dragging = false;
-let lastLockLine = "";
 
 function leftPercent(value: number): string {
   return `${((value + 1) / 2) * 100}%`;
@@ -105,25 +94,6 @@ function topPercent(value: number): string {
   return `${((1 - value) / 2) * 100}%`;
 }
 
-/** Where a normalised cue reading sits on its gauge, in percent across the rail. */
-function gaugeAt(reading: number): number {
-  return 50 + clampToField(reading) * GAUGE_SPAN;
-}
-
-function timingGauge(point: Point): number {
-  return gaugeAt(timingReading(point));
-}
-
-function loudnessGauge(point: Point): number {
-  return gaugeAt(loudnessReading(point, EAR_MODES[mode]));
-}
-
-/** Which way to move so the needle closes on the target. */
-function nudgeToward(agreed: boolean, target: number, needle: number, low: string, high: string): string {
-  if (agreed) return "Matched.";
-  return target > needle ? `Aim further ${high}.` : `Aim further ${low}.`;
-}
-
 function describe(point: Point): string {
   const vertical = point.y > 0.25 ? "high" : point.y < -0.25 ? "low" : "level with you";
   const lateral =
@@ -131,14 +101,10 @@ function describe(point: Point): string {
   return `${vertical}, ${lateral}`;
 }
 
-function matched(): { timing: boolean; loudness: boolean } {
-  return {
-    timing: timingAgrees(aim, prey),
-    loudness: loudnessAgrees(aim, prey, EAR_MODES[mode]),
-  };
-}
-
 function render(): void {
+  const ears = EAR_MODES[mode];
+  const heard = infer(prey, ears);
+
   fieldAim.style.left = leftPercent(aim.x);
   fieldAim.style.top = topPercent(aim.y);
 
@@ -146,58 +112,44 @@ function render(): void {
   fieldPrey.style.left = leftPercent(prey.x);
   fieldPrey.style.top = topPercent(prey.y);
 
-  const timingTargetAt = timingGauge(prey);
-  const timingNeedleAt = timingGauge(aim);
-  targetTiming.style.left = `${timingTargetAt}%`;
-  needleTiming.style.left = `${timingNeedleAt}%`;
+  // How far across: always available, in either pair of ears.
+  soundH.style.left = leftPercent(heard.across);
+  aimH.style.left = leftPercent(aim.x);
 
-  const loudnessTargetAt = loudnessGauge(prey);
-  const loudnessNeedleAt = loudnessGauge(aim);
-  targetLoudness.style.left = `${loudnessTargetAt}%`;
-  needleLoudness.style.left = `${loudnessNeedleAt}%`;
+  // How high: available only when the ears are aimed apart.
+  const height = heard.high;
+  soundV.hidden = height === null;
+  if (height !== null) {
+    soundV.style.top = topPercent(height);
+  }
+  aimV.style.top = topPercent(aim.y);
+  gaugeV.dataset.blind = String(height === null);
 
-  const lock = matched();
+  const microseconds = itdMicroseconds(prey);
+  const sooner = Math.abs(microseconds);
+  readTiming.textContent =
+    sooner < 4
+      ? "Both ears at once — it is straight ahead."
+      : `${microseconds > 0 ? "Right" : "Left"} ear hears it ${sooner.toFixed(0)} µs sooner.`;
+  figureTiming.textContent = "The head start gives the direction.";
 
-  readTiming.textContent = nudgeToward(
-    lock.timing,
-    timingTargetAt,
-    timingNeedleAt,
-    "left",
-    "right",
-  );
-  figureTiming.textContent = `${Math.abs(itdMicroseconds(prey)).toFixed(0)} µs between your ears`;
+  const decibels = ild(prey, ears);
+  const gap = Math.abs(decibels);
+  const louder = decibels > 0 ? "Right" : "Left";
+  const reading =
+    gap < 0.3 ? "Both ears equally loud" : `${louder} ear hears it ${gap.toFixed(1)} dB louder`;
 
   loudnessKind.textContent = LOUDNESS_KIND[mode];
-  if (mode === "level") {
-    const move = nudgeToward(lock.loudness, loudnessTargetAt, loudnessNeedleAt, "left", "right");
-    readLoudness.textContent =
-      move === "Matched." ? "Matched." : `${move.slice(0, -1)} — which the timing already told you.`;
+  if (height === null) {
+    // The measurement is real; the inference is not. That distinction is the
+    // whole page, so the readout has to make it rather than going blank.
+    readLoudness.textContent = `${reading} — and that is not a height at all.`;
+    figureLoudness.textContent = "Level ears: the difference no longer varies with height.";
     readLoudness.dataset.blind = "true";
   } else {
-    readLoudness.textContent = nudgeToward(
-      lock.loudness,
-      loudnessTargetAt,
-      loudnessNeedleAt,
-      "lower",
-      "higher",
-    );
+    readLoudness.textContent = `${reading}.`;
+    figureLoudness.textContent = "The right ear points up, so the difference gives the height.";
     delete readLoudness.dataset.blind;
-  }
-  const loudnessGap = Math.abs(ild(prey, EAR_MODES[mode]));
-  figureLoudness.textContent = `${loudnessGap.toFixed(1)} dB between your ears`;
-
-  const both = lock.timing && lock.loudness;
-  lockLine.dataset.locked = String(both);
-  const line = both
-    ? "Both readings matched — strike."
-    : lock.timing
-      ? "Left–right matched. The other reading is still off."
-      : lock.loudness
-        ? "One reading matched. Left–right is still off."
-        : "Both readings still off.";
-  if (line !== lastLockLine) {
-    lockLine.textContent = line;
-    lastLockLine = line;
   }
 
   for (const key of ["uneven", "level"] as const) {
@@ -218,8 +170,6 @@ function nextRound(): void {
 function strike(): void {
   if (revealing) return;
 
-  const lock = matched();
-  const wasLocked = lock.timing && lock.loudness;
   const hit = isHit(aim, prey);
   const current = tally[mode];
   current.strikes += 1;
@@ -234,9 +184,9 @@ function strike(): void {
   const where = describe(prey);
   if (hit) {
     status.textContent = `Hit. It was ${where}.`;
-  } else if (wasLocked && mode === "level") {
-    // The whole argument, delivered at the moment it costs something.
-    status.textContent = `Missed. It was ${where}. Your instruments agreed — they just could not see height.`;
+  } else if (mode === "level" && Math.abs(aim.x - prey.x) < 0.15) {
+    // Right column, wrong row: name it, because that is the lesson.
+    status.textContent = `Missed high or low. It was ${where} — your ears never told you which.`;
   } else {
     status.textContent = `Missed by ${distance(aim, prey).toFixed(2)}. It was ${where}.`;
   }
