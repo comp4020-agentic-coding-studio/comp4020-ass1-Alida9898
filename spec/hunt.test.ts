@@ -11,6 +11,7 @@ import {
   loudnessPerHeight,
   type Point,
   resolvesHeight,
+  stereoCue,
 } from "../acoustics";
 
 // This week's spec, as tests. The published brief asks for a core interaction
@@ -185,6 +186,66 @@ describe("what the two ears let you work out", () => {
       loudnessPerHeight(EAR_MODES.level),
       "a small-but-nonzero coefficient would mean height was merely hard to read; it has to be absent",
     ).toBeCloseTo(0, 12);
+  });
+});
+
+// The page is about hearing, so it can also be heard. I cannot check that from
+// here — no ears in this environment — but the arithmetic that drives the two
+// channels is pure, and the thing worth asserting is not "it sounds nice".
+describe("the cues can be played into a pair of headphones", () => {
+  it("starts the nearer ear immediately and holds the far one back", () => {
+    const toTheRight = stereoCue(at(0.7, 0), EAR_MODES.uneven);
+    expect(toTheRight.rightDelay, "the nearer ear should not wait").toBe(0);
+    expect(toTheRight.leftDelay, "the far ear should lag by the timing difference").toBeGreaterThan(
+      0,
+    );
+
+    const toTheLeft = stereoCue(at(-0.7, 0), EAR_MODES.uneven);
+    expect(toTheLeft.leftDelay).toBe(0);
+    expect(toTheLeft.rightDelay).toBeGreaterThan(0);
+  });
+
+  it("keeps the lag inside the range a head actually produces", () => {
+    const widest = stereoCue(at(1, 0), EAR_MODES.uneven);
+    const microseconds = Math.max(widest.leftDelay, widest.rightDelay) * 1e6;
+    expect(microseconds).toBeGreaterThan(50);
+    expect(microseconds).toBeLessThan(200);
+  });
+
+  it("leans towards the ear that is aimed at the sound", () => {
+    const high = stereoCue(at(0, 0.8), EAR_MODES.uneven);
+    expect(
+      high.rightGain,
+      "the right ear is aimed up, so a sound from above should arrive louder there",
+    ).toBeGreaterThan(high.leftGain);
+
+    const low = stereoCue(at(0, -0.8), EAR_MODES.uneven);
+    expect(low.leftGain).toBeGreaterThan(low.rightGain);
+  });
+
+  // The audible form of the whole argument: to a level pair of ears, two sounds at
+  // completely different heights are the same sound.
+  it("plays two different heights identically once the ears are level", () => {
+    const high = stereoCue(at(0.3, 0.9), EAR_MODES.level);
+    const low = stereoCue(at(0.3, -0.9), EAR_MODES.level);
+    expect(high.leftGain).toBeCloseTo(low.leftGain, 12);
+    expect(high.rightGain).toBeCloseTo(low.rightGain, 12);
+    expect(high.leftDelay).toBeCloseTo(low.leftDelay, 12);
+    expect(high.rightDelay).toBeCloseTo(low.rightDelay, 12);
+  });
+
+  it("stays inside the headroom it was given", () => {
+    for (const x of samples(9)) {
+      for (const y of samples(9)) {
+        for (const mode of ["uneven", "level"] as const) {
+          const cue = stereoCue(at(x, y), EAR_MODES[mode]);
+          for (const gain of [cue.leftGain, cue.rightGain]) {
+            expect(gain, `gain went non-finite or negative at (${x}, ${y})`).toBeGreaterThan(0);
+            expect(gain, `gain would clip at (${x}, ${y}) with ${mode} ears`).toBeLessThanOrEqual(1);
+          }
+        }
+      }
+    }
   });
 });
 

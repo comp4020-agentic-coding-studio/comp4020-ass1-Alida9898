@@ -110,6 +110,35 @@ describe("the page wires itself up", () => {
   });
 });
 
+// jsdom has no Web Audio, which makes it a free stand-in for the case that
+// actually matters: a marking room with the sound off, or a browser that refuses
+// to start an AudioContext. The page has to lose nothing but the sound.
+describe("audio is an addition and never a dependency", () => {
+  it("turns Listen off and says why when the browser cannot play", () => {
+    const listen = document.querySelector<HTMLButtonElement>("#listen");
+    expect(listen, "no Listen control in the shipped page").toBeTruthy();
+    expect(
+      listen?.disabled,
+      "the browser has no AudioContext, so Listen must be inert rather than silently doing nothing",
+    ).toBe(true);
+    expect(
+      document.querySelector("#listen-note")?.textContent ?? "",
+      "a dead button needs to explain itself, and to say the page still works without it",
+    ).toMatch(/gauges/i);
+  });
+
+  it("leaves the core interaction completely usable", () => {
+    const before = Number(text("uneven-strikes"));
+    chooseEars("uneven");
+    click("strike");
+    settle();
+    expect(
+      Number(text("uneven-strikes")),
+      "with audio unavailable the hunt still has to work end to end",
+    ).toBeGreaterThan(before);
+  });
+});
+
 describe("striking is the core interaction", () => {
   it("records the strike, reveals the prey, and blocks a double strike", () => {
     const before = Number(text("uneven-strikes"));

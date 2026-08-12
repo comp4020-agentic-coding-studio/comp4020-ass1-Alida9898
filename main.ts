@@ -25,7 +25,9 @@ import {
   isHit,
   itdMicroseconds,
   randomPrey,
+  stereoCue,
 } from "./acoustics";
+import { canListen, play } from "./listen";
 
 /**
  * A required element. Throwing is deliberate: if the markup and this file drift
@@ -58,6 +60,8 @@ const figureLoudness = need("figure-loudness");
 const loudnessKind = need("loudness-kind");
 const bearing = need("bearing");
 const strikeButton = need<HTMLButtonElement>("strike");
+const listenButton = need<HTMLButtonElement>("listen");
+const listenNote = need("listen-note");
 const status = need("status");
 
 const scoreCells: Record<EarMode, { hits: HTMLElement; strikes: HTMLElement; rate: HTMLElement }> = {
@@ -394,6 +398,21 @@ field.addEventListener("pointerup", onPointerUp);
 field.addEventListener("pointercancel", onPointerUp);
 field.addEventListener("keydown", onKeyDown);
 strikeButton.addEventListener("click", strike);
+
+// Audio is an addition, never a dependency: if the browser cannot play it, the
+// button says so plainly and the rest of the page is untouched.
+if (canListen()) {
+  listenButton.addEventListener("click", () => {
+    if (!play(stereoCue(prey, EAR_MODES[mode]))) {
+      listenButton.disabled = true;
+      listenNote.textContent = "This browser would not start audio. The gauges are the whole story anyway.";
+    }
+  });
+} else {
+  listenButton.disabled = true;
+  listenNote.textContent =
+    "This browser has no Web Audio, so Listen is off. Everything the page argues is in the gauges.";
+}
 curtainDismiss.addEventListener("click", dropCurtain);
 curtain.addEventListener("close", () => field.focus());
 

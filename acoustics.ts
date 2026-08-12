@@ -189,6 +189,44 @@ export function infer(source: Point, ears: EarConfig): Inference {
   return { across, high };
 }
 
+/** What to feed each channel to play a sound as these ears would receive it. */
+export interface StereoCue {
+  /** Seconds to hold each channel back. The nearer ear is always zero. */
+  readonly leftDelay: number;
+  readonly rightDelay: number;
+  /** Linear amplitude, not dB. */
+  readonly leftGain: number;
+  readonly rightGain: number;
+}
+
+/**
+ * Turn the two cues into something a pair of headphones can carry.
+ *
+ * Worth knowing what this does and does not demonstrate. The timing difference
+ * lands honestly: a hundred microseconds between channels is exactly what your own
+ * head produces, and your brain reads it as a direction without being asked.
+ *
+ * The loudness difference does not, and that is the interesting part. Played into
+ * your ears — which are level — an owl's height cue arrives as a lean to one side,
+ * because a level pair has nowhere else to put it. You cannot hear it as height.
+ * That is not a flaw in the simulation; it is the page's argument, in audio.
+ */
+export function stereoCue(source: Point, ears: EarConfig, headroom = 0.35): StereoCue {
+  // itd() is (left - right), so a positive value means the left ear is later.
+  const gap = itd(source);
+
+  // dB difference (right - left) split evenly about unity, so overall loudness
+  // stays put as the balance moves.
+  const halfDecibels = ild(source, ears) / 2;
+
+  return {
+    leftDelay: Math.max(0, gap),
+    rightDelay: Math.max(0, -gap),
+    leftGain: headroom * 10 ** (-halfDecibels / 20),
+    rightGain: headroom * 10 ** (halfDecibels / 20),
+  };
+}
+
 export function distance(a: Point, b: Point): number {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }

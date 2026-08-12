@@ -424,6 +424,27 @@ footer {
   cursor: default;
 }
 
+.listen {
+  padding: 0.7rem 1.3rem;
+  font: inherit;
+  color: var(--amber);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  cursor: pointer;
+}
+
+.listen:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+
+.listen-note {
+  margin: 0.9rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 .status {
   margin: 0;
   font-size: 0.9rem;
