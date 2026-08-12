@@ -421,7 +421,7 @@ footer {
    only turn the page has. */
 
 .curtain {
-  max-width: 27rem;
+  max-width: min(27rem, calc(100vw - 2rem));
   padding: 1.6rem 1.7rem;
   color: var(--ink);
   background: #12161e;
@@ -516,6 +516,25 @@ footer {
 .score tbody th {
   font-weight: 500;
   text-align: left;
+}
+
+@media (width < 34rem) {
+  body {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .field {
+    aspect-ratio: 4 / 3;
+  }
+
+  .score {
+    font-size: 0.8rem;
+  }
+
+  .score th,
+  .score td {
+    padding: 0.45rem 0.25rem;
+  }
 }
 
 @media (width >= 34rem) {
