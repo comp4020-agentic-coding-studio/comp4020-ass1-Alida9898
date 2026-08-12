@@ -189,6 +189,34 @@ export function infer(source: Point, ears: EarConfig): Inference {
   return { across, high };
 }
 
+// Rolling a whole head, so the page can answer its sharpest objection with an
+// assertion instead of a paragraph. itd() above assumes the ears sit level on
+// either side; these two functions drop that assumption.
+//
+// The distinction they exist to pin down: a roll turns BOTH cues together, because
+// it carries the ear positions (which set the timing axis) along with the ear aims
+// (which set the loudness axis). An owl's offset turns only the aims. Same angle,
+// one thing moved instead of two — and that is the difference between two rulers
+// rotated and two rulers prised apart.
+
+/** Timing difference for a head rolled by this many degrees. Roll 0 is itd(). */
+export function itdRolled(source: Point, rollDegrees: number): number {
+  const roll = rollDegrees * TAU_DEG;
+  const alongInteraural =
+    azimuthOf(source.x) * Math.cos(roll) + elevationOf(source.y) * Math.sin(roll);
+  return (HEAD_WIDTH / SPEED_OF_SOUND) * Math.sin(alongInteraural);
+}
+
+/** The same pair of ears, carried round by a head roll. */
+export function earsRolled(ears: EarConfig, rollDegrees: number): EarConfig {
+  const roll = rollDegrees * TAU_DEG;
+  const carry = (ear: Ear): Ear => ({
+    azimuthAim: ear.azimuthAim * Math.cos(roll) - ear.elevationAim * Math.sin(roll),
+    elevationAim: ear.azimuthAim * Math.sin(roll) + ear.elevationAim * Math.cos(roll),
+  });
+  return { left: carry(ears.left), right: carry(ears.right) };
+}
+
 /**
  * A pair of ears with an arbitrary vertical offset, for asking what would happen
  * if the asymmetry were smaller. The lateral aim is unchanged: only the offset

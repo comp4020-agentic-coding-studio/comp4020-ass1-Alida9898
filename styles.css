@@ -401,6 +401,14 @@ footer {
   text-align: center;
 }
 
+.pull {
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+  font-size: 1.05rem;
+  color: var(--ink);
+  border-left: 2px solid var(--amber);
+}
+
 .exhibit-heading {
   margin: 2.5rem 0 0.9rem;
   font-size: 1.1rem;

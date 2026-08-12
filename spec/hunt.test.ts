@@ -10,7 +10,11 @@ import {
   itdMicroseconds,
   EAR_JITTER_DECIBELS,
   earsMirrored,
+  distance,
+  earsRolled,
   earsWithOffset,
+  itdRolled,
+  MAX_ELEVATION,
   heightUncertainty,
   loudnessPerHeight,
   type Point,
@@ -269,6 +273,69 @@ describe("aiming the ears wider buys no height", () => {
       resolvesHeight(earsWithOffset(0.5)),
       "half a degree of vertical difference is a terrible instrument but it is an instrument; the cliff is at exactly zero",
     ).toBe(true);
+  });
+});
+
+// The objection this page has to survive, asserted rather than argued: tilt your
+// head twenty-five degrees and are you not an owl?
+//
+// No, and the angle was never the point. A roll carries the ear POSITIONS round as
+// well as the aims, so the timing axis turns with the loudness axis and the two
+// cues stay parallel — two rulers rotated together still measure one direction. An
+// owl's offset moves only the aims, prising the two axes apart.
+//
+// Stated as indistinguishability, which is what "one axis" actually costs you:
+// under a tilt there are pairs of places far apart that sound EXACTLY alike.
+describe("tilting your head is not the same as an owl's offset", () => {
+  const TILT = 25;
+
+  /** Two points separated along the axis a head tilted by `roll` cannot resolve. */
+  function pairAcrossTheBlindAxis(roll: number, reach: number): [Point, Point] {
+    const radians = roll * (Math.PI / 180);
+    // Perpendicular to the interaural axis in angle space, back into field units.
+    const dx = (-Math.sin(radians) * reach) / MAX_AZIMUTH;
+    const dy = (Math.cos(radians) * reach) / MAX_ELEVATION;
+    return [at(-dx, -dy), at(dx, dy)];
+  }
+
+  const [here, there] = pairAcrossTheBlindAxis(TILT, 0.32);
+
+  it("puts two far-apart places at the same spot for a tilted head", () => {
+    expect(distance(here, there), "the two probe points must be genuinely far apart").toBeGreaterThan(
+      HIT_RADIUS * 4,
+    );
+
+    const tilted = earsRolled(EAR_MODES.level, TILT);
+    expect(
+      itdRolled(there, TILT),
+      "a tilted head should hear the same timing from both places",
+    ).toBeCloseTo(itdRolled(here, TILT), 9);
+    expect(
+      ild(there, tilted),
+      "and the same loudness: both cues turned together, so both are blind along the same line",
+    ).toBeCloseTo(ild(here, tilted), 9);
+  });
+
+  it("tells those same two places apart with an owl's ears", () => {
+    // Ears where they always were — only the aims are offset.
+    const owl = earsWithOffset(TILT);
+    expect(
+      Math.abs(ild(there, owl) - ild(here, owl)),
+      "an owl must distinguish the two places a tilted head confuses; that gap is the entire advantage",
+    ).toBeGreaterThan(1);
+  });
+
+  it("keeps the timing cue horizontal for an owl and turns it for a tilt", () => {
+    const high = at(0, 0.8);
+    const low = at(0, -0.8);
+    expect(
+      itdRolled(high, 0),
+      "an owl's ears stay on either side of its head, so height must not touch the timing",
+    ).toBeCloseTo(itdRolled(low, 0), 12);
+    expect(
+      Math.abs(itdRolled(high, TILT) - itdRolled(low, TILT)),
+      "a tilted head drags the timing axis round with it, which is the half of the story I got wrong twice",
+    ).toBeGreaterThan(0);
   });
 });
 
