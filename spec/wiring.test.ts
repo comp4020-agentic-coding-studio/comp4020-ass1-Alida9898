@@ -45,6 +45,50 @@ beforeEach(() => {
   settle();
 });
 
+// An interactive explainer that explains first is a page with a toy at the bottom.
+// The hunt goes above the theory on purpose, and that ordering is a decision worth
+// pinning: it is invisible to every other check and trivially lost in an edit.
+describe("the page puts the hunt before the explanation", () => {
+  const headings = [...document.querySelectorAll("h2")].map(
+    (heading) => heading.textContent?.trim() ?? "",
+  );
+
+  it("opens with something to do", () => {
+    const hunt = headings.findIndex((text) => /^Hunt$/.test(text));
+    const theory = headings.findIndex((text) => /How the owl does it/.test(text));
+    const payoff = headings.findIndex((text) => /What just happened/.test(text));
+
+    expect(hunt, "no Hunt section in the shipped page").toBeGreaterThanOrEqual(0);
+    expect(theory, "no explanation section in the shipped page").toBeGreaterThanOrEqual(0);
+    expect(
+      hunt,
+      "the explanation came before the hunt; the interaction has to be the hook, not the reward",
+    ).toBeLessThan(theory);
+    expect(theory, "the payoff should land after the mechanism, not before it").toBeLessThan(payoff);
+  });
+});
+
+// The invariants give every <img> an alt check, and inline SVG slips straight past
+// it — so the diagrams need their own.
+describe("the diagrams are legible to a screen reader", () => {
+  it("gives each one a real accessible name", () => {
+    const diagrams = [...document.querySelectorAll('svg[role="img"]')];
+    expect(diagrams.length, "expected the owl and human diagrams").toBe(2);
+
+    for (const diagram of diagrams) {
+      const labelId = diagram.getAttribute("aria-labelledby");
+      expect(labelId, "an inline svg with role=img but no aria-labelledby is an unlabelled image").toBeTruthy();
+
+      const label = labelId === null ? null : document.getElementById(labelId);
+      const described = label?.textContent?.trim() ?? "";
+      expect(
+        described.length,
+        `the diagram's <title> is missing or too thin to describe it: "${described}"`,
+      ).toBeGreaterThan(40);
+    }
+  });
+});
+
 describe("the page wires itself up", () => {
   it("puts a reading in both cue meters before the first strike", () => {
     expect(

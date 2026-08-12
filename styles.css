@@ -336,6 +336,57 @@ footer {
   color: var(--muted);
 }
 
+/* Two schematics, side by side, so "aimed apart" and "aimed the same" can be
+   compared at a glance rather than held in the reader's head. The cones are the
+   load-bearing part: the owl's point at different things, yours are mirrors. */
+
+.ears-figure {
+  display: grid;
+  gap: 1.75rem;
+  margin: 1.75rem 0;
+}
+
+.ears-diagram svg {
+  display: block;
+  width: 100%;
+  max-width: 15rem;
+  margin: 0 auto;
+}
+
+.diagram-head {
+  fill: #151a23;
+  stroke: var(--muted);
+  stroke-width: 2;
+}
+
+.diagram-level {
+  stroke: var(--line);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 5;
+}
+
+.diagram-cone {
+  fill: rgb(224 162 68 / 20%);
+  stroke: rgb(224 162 68 / 45%);
+  stroke-width: 1;
+}
+
+.diagram-ear {
+  fill: var(--amber);
+}
+
+.diagram-label {
+  font-size: 13px;
+  fill: var(--amber);
+}
+
+.diagram-caption {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-align: center;
+}
+
 .controls {
   display: flex;
   gap: 1rem;
@@ -471,6 +522,10 @@ footer {
   .cues {
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
+  }
+
+  .ears-figure {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
