@@ -189,6 +189,41 @@ export function infer(source: Point, ears: EarConfig): Inference {
   return { across, high };
 }
 
+/**
+ * A pair of ears with an arbitrary vertical offset, for asking what would happen
+ * if the asymmetry were smaller. The lateral aim is unchanged: only the offset
+ * being explained varies.
+ */
+export function earsWithOffset(degrees: number): EarConfig {
+  const aim = Math.abs(degrees) * TAU_DEG;
+  return {
+    left: { azimuthAim: -LATERAL_AIM, elevationAim: -aim },
+    right: { azimuthAim: LATERAL_AIM, elevationAim: aim },
+  };
+}
+
+/**
+ * How far out a recovered height lands, given a wobble of this many dB in reading
+ * the loudness difference. Expressed as a fraction of the field's half-height.
+ *
+ * This is why a barn owl's ears are offset by tens of degrees rather than a couple.
+ * Recovering height means dividing by how much the loudness difference moves per
+ * unit of height, and that divisor shrinks with the offset — so a nearly-level pair
+ * amplifies every small misreading into a wild answer. The ears are not merely
+ * uneven; they have to be uneven by a LOT, and this is the function that says so.
+ *
+ * Exact rather than sampled, because ild is linear in height: no Monte Carlo, no
+ * seeded randomness, nothing to make flaky.
+ */
+export function heightUncertainty(ears: EarConfig, jitterDecibels: number): number {
+  const perHeight = loudnessPerHeight(ears);
+  if (Math.abs(perHeight) <= HEIGHT_FLOOR) return Number.POSITIVE_INFINITY;
+  return Math.abs(jitterDecibels / perHeight);
+}
+
+/** What a barn owl can actually tell apart in a loudness comparison, roughly. */
+export const EAR_JITTER_DECIBELS = 1;
+
 /** What to feed each channel to play a sound as these ears would receive it. */
 export interface StereoCue {
   /** Seconds to hold each channel back. The nearer ear is always zero. */

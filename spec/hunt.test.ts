@@ -8,6 +8,9 @@ import {
   isHit,
   itd,
   itdMicroseconds,
+  EAR_JITTER_DECIBELS,
+  earsWithOffset,
+  heightUncertainty,
   loudnessPerHeight,
   type Point,
   resolvesHeight,
@@ -192,6 +195,51 @@ describe("what the two ears let you work out", () => {
 // The page is about hearing, so it can also be heard. I cannot check that from
 // here — no ears in this environment — but the arithmetic that drives the two
 // channels is pure, and the thing worth asserting is not "it sounds nice".
+// The page says an owl's ears are uneven. It does not yet say they have to be
+// uneven by a LOT, and that is a separate, checkable fact: recovering height means
+// dividing by how much the loudness difference moves per unit of height, so a
+// nearly-level pair turns a small misreading into a wild answer.
+describe("the asymmetry has to be large to be worth having", () => {
+  it("agrees with the two named pairs of ears at its endpoints", () => {
+    expect(
+      loudnessPerHeight(earsWithOffset(25)),
+      "the slider at full offset must be the same ears the hunt calls an owl's, or the exhibit contradicts the hunt",
+    ).toBeCloseTo(loudnessPerHeight(EAR_MODES.uneven), 10);
+    expect(loudnessPerHeight(earsWithOffset(0))).toBeCloseTo(
+      loudnessPerHeight(EAR_MODES.level),
+      10,
+    );
+  });
+
+  it("blows the height up as the offset shrinks, in inverse proportion", () => {
+    const wide = heightUncertainty(earsWithOffset(20), EAR_JITTER_DECIBELS);
+    const half = heightUncertainty(earsWithOffset(10), EAR_JITTER_DECIBELS);
+    const quarter = heightUncertainty(earsWithOffset(5), EAR_JITTER_DECIBELS);
+
+    expect(half / wide, "halving the offset should double the error").toBeCloseTo(2, 6);
+    expect(quarter / wide, "quartering it should quadruple the error").toBeCloseTo(4, 6);
+  });
+
+  it("is sharp at a real barn owl's offset and useless near level", () => {
+    expect(
+      heightUncertainty(EAR_MODES.uneven, EAR_JITTER_DECIBELS),
+      "a real owl's offset should place a height to within a small part of the field",
+    ).toBeLessThan(0.15);
+    expect(
+      heightUncertainty(earsWithOffset(2), EAR_JITTER_DECIBELS),
+      "a two-degree offset should be so imprecise it is barely a reading at all",
+    ).toBeGreaterThan(0.9);
+  });
+
+  it("goes to infinity exactly where infer() gives up", () => {
+    expect(heightUncertainty(EAR_MODES.level, EAR_JITTER_DECIBELS)).toBe(
+      Number.POSITIVE_INFINITY,
+    );
+    expect(resolvesHeight(earsWithOffset(0))).toBe(false);
+    expect(resolvesHeight(earsWithOffset(1))).toBe(true);
+  });
+});
+
 describe("the cues can be played into a pair of headphones", () => {
   it("starts the nearer ear immediately and holds the far one back", () => {
     const toTheRight = stereoCue(at(0.7, 0), EAR_MODES.uneven);

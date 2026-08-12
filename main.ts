@@ -24,6 +24,10 @@ import {
   type Inference,
   isHit,
   itdMicroseconds,
+  EAR_JITTER_DECIBELS,
+  earsWithOffset,
+  heightUncertainty,
+  HIT_RADIUS,
   randomPrey,
   stereoCue,
 } from "./acoustics";
@@ -62,6 +66,9 @@ const bearing = need("bearing");
 const strikeButton = need<HTMLButtonElement>("strike");
 const listenButton = need<HTMLButtonElement>("listen");
 const listenNote = need("listen-note");
+const offsetSlider = need<HTMLInputElement>("offset");
+const offsetBand = need("offset-band");
+const offsetRead = need("offset-read");
 const status = need("status");
 
 const scoreCells: Record<EarMode, { hits: HTMLElement; strikes: HTMLElement; rate: HTMLElement }> = {
@@ -391,6 +398,40 @@ function onEarsChange(event: Event): void {
     setEars(input.value === "level" ? "level" : "uneven");
   }
 }
+
+/**
+ * The supporting exhibit: what a decibel of slop costs at a given offset.
+ *
+ * Deliberately separate from the hunt, and deliberately not a replacement for the
+ * two-way toggle — the owl-versus-you comparison is the page's argument, and this
+ * is a footnote to it about magnitude. Error is quoted in target widths because
+ * that is the unit the visitor has just spent ten minutes learning.
+ */
+function renderOffset(): void {
+  const degrees = Number(offsetSlider.value);
+  const spread = heightUncertainty(earsWithOffset(degrees), EAR_JITTER_DECIBELS);
+
+  if (!Number.isFinite(spread)) {
+    offsetBand.style.width = "100%";
+    offsetRead.textContent =
+      "Level. There is no height to be out by — the division has nothing to divide by.";
+    return;
+  }
+
+  const targets = spread / HIT_RADIUS;
+  // The bar is the error as a share of the field's full height, capped at the rail.
+  offsetBand.style.width = `${Math.min(100, (spread / 2) * 100)}%`;
+  const verdict =
+    targets < 2
+      ? "Sharp enough to strike with."
+      : targets < 6
+        ? "You would miss more than you hit."
+        : "Not a measurement any more.";
+  offsetRead.textContent = `${degrees}° offset: one decibel of slop puts the height out by ${targets.toFixed(1)} target widths. ${verdict}`;
+}
+
+offsetSlider.addEventListener("input", renderOffset);
+renderOffset();
 
 field.addEventListener("pointerdown", onPointerDown);
 field.addEventListener("pointermove", onPointerMove);

@@ -139,6 +139,43 @@ describe("audio is an addition and never a dependency", () => {
   });
 });
 
+describe("the offset exhibit answers why so lopsided", () => {
+  function setOffset(degrees: number): void {
+    const slider = document.querySelector<HTMLInputElement>("#offset");
+    if (!slider) throw new Error("no offset slider in the shipped page");
+    slider.value = String(degrees);
+    slider.dispatchEvent(new Event("input"));
+  }
+
+  it("gets worse as the offset shrinks", () => {
+    setOffset(20);
+    const wide = text("offset-read");
+    setOffset(4);
+    const narrow = text("offset-read");
+
+    const widthOf = (reading: string) => Number(/([\d.]+) target widths/.exec(reading)?.[1] ?? "0");
+    expect(widthOf(wide), "no error figure in the readout").toBeGreaterThan(0);
+    expect(
+      widthOf(narrow),
+      "shrinking the offset must make the height worse, or the exhibit is not making its point",
+    ).toBeGreaterThan(widthOf(wide));
+  });
+
+  it("says there is no height at all at zero, rather than quoting a huge number", () => {
+    setOffset(0);
+    expect(
+      text("offset-read"),
+      "at zero offset the height is absent, not merely imprecise; a number here would contradict the rest of the page",
+    ).toMatch(/no height/i);
+  });
+
+  it("labels the slider for anyone not looking at it", () => {
+    const slider = document.querySelector<HTMLInputElement>("#offset");
+    expect(slider?.labels?.[0]?.textContent?.trim().length ?? 0).toBeGreaterThan(5);
+    expect(slider?.getAttribute("aria-describedby")).toBe("offset-read");
+  });
+});
+
 describe("striking is the core interaction", () => {
   it("records the strike, reveals the prey, and blocks a double strike", () => {
     const before = Number(text("uneven-strikes"));

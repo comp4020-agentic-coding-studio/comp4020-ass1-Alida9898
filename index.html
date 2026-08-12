@@ -258,6 +258,42 @@
           <em>louder</em> can tell an owl a height and cannot tell you one.
         </p>
 
+        <h3 class="exhibit-heading">Why so lopsided?</h3>
+
+        <p>
+          It is not enough for the ears to be uneven. Working a height out of the
+          loudness difference means dividing by how much that difference moves per
+          unit of height — and that divisor shrinks with the offset. So a nearly
+          level pair takes a small misreading and turns it into a wild answer. Slide
+          the offset down and watch what a single decibel of slop costs.
+        </p>
+
+        <div class="exhibit">
+          <label class="exhibit-label" for="offset">Vertical offset between the ears</label>
+          <input
+            class="exhibit-slider"
+            type="range"
+            id="offset"
+            min="0"
+            max="25"
+            step="1"
+            value="25"
+            aria-describedby="offset-read"
+          />
+          <div class="exhibit-band" aria-hidden="true">
+            <span class="exhibit-band-fill" id="offset-band"></span>
+            <span class="exhibit-band-target"></span>
+          </div>
+          <p class="exhibit-read" id="offset-read"></p>
+        </div>
+
+        <p>
+          Which is why a barn owl is not slightly lopsided. Evolution did not stop at
+          two degrees, because two degrees is not a measurement. (The hunt above is
+          noiseless — real ears are not, and height is the coarser of an owl's two
+          axes even at full offset.)
+        </p>
+
         <p>
           If you pressed <strong>Listen</strong>, you have already run the experiment
           on yourself. The timing difference arrived as a direction, unmistakably,
