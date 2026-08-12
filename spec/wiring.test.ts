@@ -123,3 +123,51 @@ describe("the scoreboard keeps the two pairs of ears separate", () => {
     expect(text("uneven-rate")).toMatch(/^\d+%$/);
   });
 });
+
+// The marks left on the field are the argument drawn rather than claimed: under
+// your own ears the hits collapse into a band and the misses fill in the rest.
+// That picture only exists if the two pairs of ears are kept apart.
+describe("the field keeps a record of where the mouse was", () => {
+  function markCount(): number {
+    return document.querySelectorAll("#field-marks .field-mark").length;
+  }
+
+  it("leaves one mark per strike, labelled with the outcome", () => {
+    chooseEars("uneven");
+    const before = markCount();
+    click("strike");
+    settle();
+    expect(markCount(), "a strike left no mark on the field").toBe(before + 1);
+
+    const marks = [...document.querySelectorAll<HTMLElement>("#field-marks .field-mark")];
+    for (const mark of marks) {
+      expect(
+        mark.dataset.hit,
+        "every mark must say whether it was a hit; an unlabelled mark draws no argument",
+      ).toMatch(/^(true|false)$/);
+      expect(mark.style.left).toMatch(/%$/);
+      expect(mark.style.top).toMatch(/%$/);
+    }
+  });
+
+  it("keeps each pair of ears' marks to itself", () => {
+    chooseEars("uneven");
+    click("strike");
+    settle();
+    const ownedByOwl = markCount();
+
+    chooseEars("level");
+    const ownedByYou = markCount();
+    click("strike");
+    settle();
+    expect(markCount(), "a strike under your own ears did not add to your own record").toBe(
+      ownedByYou + 1,
+    );
+
+    chooseEars("uneven");
+    expect(
+      markCount(),
+      "switching ears changed the owl's record; mixing the two would destroy the comparison the page is making",
+    ).toBe(ownedByOwl);
+  });
+});

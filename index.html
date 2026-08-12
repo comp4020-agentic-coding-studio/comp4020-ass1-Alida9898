@@ -6,7 +6,7 @@
     <title>The Owl's Uneven Ears</title>
     <meta
       name="description"
-      content="A barn owl's two ear openings point in different directions. One gauge tells you how far across a sound is; the other tells you how high — until you level the ears, and it cannot tell you anything."
+      content="A barn owl's two ear openings point in different directions, and yours do not. Hunt in the dark with its ears, then try again with your own."
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
@@ -18,7 +18,7 @@
     </header>
 
     <main>
-      <h1>An owl's ears are uneven. That is the whole trick.</h1>
+      <h1>An owl's ears are uneven. Yours are not.</h1>
 
       <p class="lede">
         A barn owl drops onto a mouse it has never seen — in the dark, under snow.
@@ -26,19 +26,38 @@
         in different directions: the left one aimed down, the right one aimed up.
       </p>
 
+      <p>Two ears give you two facts about a sound.</p>
+
       <p>
-        Almost every animal with two ears can tell left from right. Sound reaches
-        the nearer ear a fraction sooner, and that head start <em>is</em> the
-        direction. But it says nothing about <em>height</em> — a mouse above you
-        and a mouse below you arrive at both ears alike. Uneven ears are how the owl
-        gets the second axis, and they are why it can hit what it cannot see.
+        <strong>Which ear hears it first.</strong> Sound takes time to travel, so
+        the nearer ear hears it a fraction sooner. That head start is a direction:
+        left, or right.
       </p>
 
       <p>
-        An owl does not grope around for its target. It hears the mouse once, works
-        out a direction, and drops. So you get the same two instruments it has: one
-        along the bottom of the field, reading off how far across the sound is, and
-        one up the side, reading off how high. Put your aim where the two cross.
+        <strong>Which ear hears it louder.</strong> An ear is not equally sensitive
+        in every direction — it hears best along the direction it points.
+      </p>
+
+      <p>
+        This is where you and an owl part company. Your two ear openings sit level
+        with each other, aimed out to the sides. So for you, the louder ear only
+        ever means <em>over there, on my left</em> — which the timing already said.
+        Your second fact is a copy of your first.
+      </p>
+
+      <p>
+        A barn owl's ear openings are offset vertically. Sound from above lands
+        closer to where the right ear points, so the right ear hears it louder;
+        sound from below, the left. Now <em>louder</em> answers a different question
+        from <em>first</em> — and two different answers pin down one point in the
+        dark.
+      </p>
+
+      <p>
+        So: it is dark, and there is a mouse. You get the owl's two instruments —
+        one along the bottom of the field for how far across, one up the side for
+        how high. Put your aim where they cross.
       </p>
 
       <section class="hunt" aria-labelledby="hunt-heading">
@@ -63,6 +82,7 @@
             aria-label="Hunting field. Drag to aim, or move your aim with the arrow keys and press Enter to strike."
           >
             <div class="field-grid" aria-hidden="true"></div>
+            <div class="field-marks" id="field-marks" aria-hidden="true"></div>
             <div class="field-aim" id="field-aim" aria-hidden="true"></div>
             <div class="field-prey" id="field-prey" aria-hidden="true" hidden></div>
           </div>
@@ -80,9 +100,10 @@
         </div>
 
         <p class="field-hint">
-          The hollow ring on each gauge is where your ears say the sound is. The
-          solid dot is where you are aiming. Drag inside the field, or focus it and
-          use the arrow keys, then press Enter to strike.
+          The hollow ring on each gauge is where your ears say the mouse is; the
+          solid dot is where you are aiming. Every strike leaves a mark on the
+          field — green where you connected, red where you did not. Drag inside the
+          field, or focus it and use the arrow keys, then press Enter to strike.
         </p>
 
         <div class="cues">
@@ -108,15 +129,21 @@
           <p class="status" id="status" role="status">Aim, then strike.</p>
         </div>
 
+        <p class="reveal" id="reveal" role="status" hidden>
+          <strong>Those were an owl's ears. These are yours.</strong>
+          Nothing else changed — same dark, same mouse, same left-to-right timing.
+          Only the vertical offset is gone.
+        </p>
+
         <fieldset class="ears">
           <legend>Ears</legend>
           <label>
             <input type="radio" name="ears" value="uneven" id="ears-uneven" checked />
-            <span>Uneven <small>a real barn owl: left aimed down, right aimed up</small></span>
+            <span>An owl's <small>offset vertically: left aimed down, right aimed up</small></span>
           </label>
           <label>
             <input type="radio" name="ears" value="level" id="ears-level" />
-            <span>Level <small>same head, both ears aimed straight ahead</small></span>
+            <span>Yours <small>level with each other, like every human's</small></span>
           </label>
         </fieldset>
 
@@ -132,13 +159,13 @@
           </thead>
           <tbody>
             <tr>
-              <th scope="row">Uneven</th>
+              <th scope="row">An owl's</th>
               <td id="uneven-hits">0</td>
               <td id="uneven-strikes">0</td>
               <td id="uneven-rate">—</td>
             </tr>
             <tr>
-              <th scope="row">Level</th>
+              <th scope="row">Yours</th>
               <td id="level-hits">0</td>
               <td id="level-strikes">0</td>
               <td id="level-rate">—</td>
@@ -151,34 +178,41 @@
         <h2 id="why-heading">What just happened</h2>
 
         <p>
-          With uneven ears, two readings and two axes give one place. That is not a
-          knack you picked up — it is arithmetic the shape of the owl's head does
-          for it, before it has moved a muscle. The gauge up the side was a height,
-          the same way a thermometer is a temperature.
+          With an owl's ears, two facts and two axes give one place. That is not a
+          knack you picked up — it is arithmetic the shape of its skull does for it,
+          before it has moved a muscle.
         </p>
 
         <p>
-          Level the ears and that gauge has nothing to put on it. Notice what did
+          Then the second fact folded back into the first. Notice what did
           <em>not</em> happen: the ears did not go quiet. They still report a
-          difference in loudness, and it is still a real measurement — the number is
-          right there. What broke is the step after it. Aim both ears the same way
-          and the loudness difference stops varying with height at all, so there is
-          no height it could be pointing at. Solve for it and the term is gone.
+          difference in loudness, and it is still a real measurement — the number
+          stayed on screen the whole time. What broke is the step after it. Aim both
+          ears the same way and the loudness difference stops varying with height at
+          all, so there is no height for it to be pointing at. Solve for one and the
+          term is gone.
         </p>
 
         <p>
-          So you were not working with a worse instrument. You were working with one
-          fewer instrument, and the only way to find that out was to strike and
-          miss. Left and right stayed perfect the whole time, which is why every
-          miss was vertical, and why you still connected now and then — you knew the
-          column, and the rest was luck.
+          So the second half was not a worse instrument. It was one instrument fewer
+          — and it was <em>you</em>. Those are your ears. You have had them your
+          whole life, you have never once placed a sound by height by comparing them,
+          and until you missed a mouse in the dark you had no reason to notice.
+        </p>
+
+        <p>
+          Look at the marks on the field. Under your own ears the green ones sit in a
+          band at whatever height you kept guessing, and the red ones fill in
+          everywhere else. Left and right were perfect all along, which is why every
+          miss was vertical.
         </p>
 
         <p>
           Aiming an ear is what turns it into a measuring instrument along that axis.
           Two ears pointed the same way are one instrument used twice; point them
-          apart and the pair answers a question neither could answer alone. The owl's
-          skull is lopsided for exactly one reason, and it is the reason it eats.
+          apart and the pair answers a question neither could answer alone. A barn
+          owl's skull is lopsided for exactly one reason, and it is the reason it
+          eats.
         </p>
       </section>
     </main>
@@ -186,8 +220,11 @@
     <footer>
       <p>
         Built for COMP4020. The acoustics are simplified — separable cues, no head
-        shadow, no facial ruff — but the asymmetry, and what levelling it costs you,
-        are real.
+        shadow, no facial ruff. And in fairness to your own ears: the folds of the
+        outer ear do give you a crude sense of elevation, by filtering a sound
+        differently depending on where it comes from. That is a separate trick, it
+        works one ear at a time, and it is nothing like as sharp. The comparison
+        between your two ears really does say nothing about height.
       </p>
     </footer>
 

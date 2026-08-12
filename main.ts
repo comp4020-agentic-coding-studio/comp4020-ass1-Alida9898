@@ -41,6 +41,8 @@ function need<T extends HTMLElement>(id: string): T {
 const field = need("field");
 const fieldAim = need("field-aim");
 const fieldPrey = need("field-prey");
+const fieldMarks = need("field-marks");
+const reveal = need("reveal");
 const gaugeV = need("gauge-v");
 const soundV = need("v-sound");
 const aimV = need("v-aim");
@@ -65,6 +67,19 @@ const KEY_STEP = 0.04;
 /** How long the prey stays visible after a strike, in milliseconds. */
 const REVEAL_MS = 1400;
 
+/**
+ * Hits with an owl's ears before the page levels them for you.
+ *
+ * The toggle was always there, but a control you choose to flip is not a
+ * surprise, and the whole point lands harder when it happens TO you — right
+ * after you have started to feel competent. Only fires if you have not already
+ * found the toggle yourself; once you have, the surprise is spent.
+ */
+const HITS_BEFORE_LEVELLING = 5;
+
+/** Marks kept on the field. Enough to see the pattern, not enough to smother it. */
+const MAX_MARKS = 60;
+
 const LOUDNESS_KIND: Record<EarMode, string> = {
   uneven: "from which ear hears it louder — the gauge up the side",
   level: "both ears now point the same way, so this gauge has nothing to show",
@@ -85,6 +100,15 @@ let prey: Point = randomPrey(Math.random);
 let aim: Point = { x: 0, y: 0 };
 let revealing = false;
 let dragging = false;
+let chosenByVisitor = false;
+let levelledForYou = false;
+
+interface Mark {
+  readonly at: Point;
+  readonly hit: boolean;
+}
+
+const marks: Record<EarMode, Mark[]> = { uneven: [], level: [] };
 
 function leftPercent(value: number): string {
   return `${((value + 1) / 2) * 100}%`;
@@ -161,6 +185,37 @@ function render(): void {
   }
 }
 
+/**
+ * Redraw the strike history. Deliberately separate from render(): render() runs on
+ * every pointermove, and marks only change on a strike.
+ *
+ * Only the current pair of ears is shown. Mixing them would destroy the picture,
+ * and the picture is the argument — under level ears the green marks collapse into
+ * a band at whatever height you kept guessing, with red filling in the rest.
+ */
+function renderMarks(): void {
+  fieldMarks.replaceChildren();
+  for (const mark of marks[mode]) {
+    const dot = document.createElement("span");
+    dot.className = "field-mark";
+    dot.dataset.hit = String(mark.hit);
+    dot.style.left = leftPercent(mark.at.x);
+    dot.style.top = topPercent(mark.at.y);
+    fieldMarks.append(dot);
+  }
+}
+
+/** Switch ears, from the radio or from the page's own hand. */
+function setEars(next: EarMode): void {
+  mode = next;
+  const input = document.querySelector<HTMLInputElement>(`#ears-${next}`);
+  if (input) {
+    input.checked = true;
+  }
+  renderMarks();
+  nextRound();
+}
+
 function nextRound(): void {
   prey = randomPrey(Math.random);
   revealing = false;
@@ -177,9 +232,15 @@ function strike(): void {
     current.hits += 1;
   }
 
+  marks[mode].push({ at: prey, hit });
+  if (marks[mode].length > MAX_MARKS) {
+    marks[mode].shift();
+  }
+
   revealing = true;
   strikeButton.disabled = true;
   render();
+  renderMarks();
 
   const where = describe(prey);
   if (hit) {
@@ -194,6 +255,20 @@ function strike(): void {
   window.setTimeout(() => {
     strikeButton.disabled = false;
     status.textContent = "Aim, then strike.";
+
+    const readyToLevel =
+      mode === "uneven" &&
+      !chosenByVisitor &&
+      !levelledForYou &&
+      tally.uneven.hits >= HITS_BEFORE_LEVELLING;
+
+    if (readyToLevel) {
+      levelledForYou = true;
+      reveal.hidden = false;
+      setEars("level");
+      return;
+    }
+
     nextRound();
   }, REVEAL_MS);
 }
@@ -249,8 +324,8 @@ function onKeyDown(event: KeyboardEvent): void {
 function onEarsChange(event: Event): void {
   const input = event.currentTarget;
   if (input instanceof HTMLInputElement && input.checked) {
-    mode = input.value === "level" ? "level" : "uneven";
-    nextRound();
+    chosenByVisitor = true;
+    setEars(input.value === "level" ? "level" : "uneven");
   }
 }
 
@@ -266,3 +341,4 @@ for (const input of document.querySelectorAll<HTMLInputElement>('input[name="ear
 }
 
 render();
+renderMarks();

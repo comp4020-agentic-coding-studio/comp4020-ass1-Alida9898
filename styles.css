@@ -6,6 +6,7 @@
   --dark: #05070a;
   --amber: #e0a244;
   --warm: #f0664e;
+  --green: #7ed957;
   --column: 42rem;
 }
 
@@ -120,6 +121,31 @@ footer {
     linear-gradient(to bottom, rgb(255 255 255 / 4%) 1px, transparent 1px);
   background-position: center;
   background-size: 25% 25%;
+}
+
+/* Every strike leaves its mark where the mouse actually was. Twenty rounds in,
+   the two pairs of ears have drawn two visibly different pictures, and that
+   picture is the argument the prose only claims. */
+
+.field-marks {
+  position: absolute;
+  inset: 0;
+}
+
+.field-mark {
+  position: absolute;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin: -0.2rem 0 0 -0.2rem;
+  border-radius: 50%;
+}
+
+.field-mark[data-hit="true"] {
+  background: rgb(126 217 87 / 60%);
+}
+
+.field-mark[data-hit="false"] {
+  background: rgb(240 102 78 / 40%);
 }
 
 .field-aim {
@@ -337,6 +363,24 @@ footer {
   margin: 0;
   font-size: 0.9rem;
   color: var(--muted);
+}
+
+/* The moment the page levels your ears for you. */
+
+.reveal {
+  margin: 1.5rem 0 0;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: rgb(224 162 68 / 12%);
+  border-left: 2px solid var(--amber);
+  border-radius: 0.25rem;
+}
+
+.reveal strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--amber);
 }
 
 .ears {
