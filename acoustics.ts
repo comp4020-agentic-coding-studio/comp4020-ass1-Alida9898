@@ -203,6 +203,23 @@ export function earsWithOffset(degrees: number): EarConfig {
 }
 
 /**
+ * A mirror-symmetric pair, aimed out to the sides by any angle you like.
+ *
+ * This exists to answer the obvious objection: if the trick is that the ears point
+ * different ways, can you not just tilt your head? Tilting rotates the plane the
+ * pair is symmetric about — it does not remove the plane. And a pair with a plane
+ * of symmetry can only ever answer one question at a time, whichever way it is
+ * turned. See the test: no lateral aim recovers a height.
+ */
+export function earsMirrored(lateralDegrees: number): EarConfig {
+  const aim = Math.abs(lateralDegrees) * TAU_DEG;
+  return {
+    left: { azimuthAim: -aim, elevationAim: 0 },
+    right: { azimuthAim: aim, elevationAim: 0 },
+  };
+}
+
+/**
  * How far out a recovered height lands, given a wobble of this many dB in reading
  * the loudness difference. Expressed as a fraction of the field's half-height.
  *

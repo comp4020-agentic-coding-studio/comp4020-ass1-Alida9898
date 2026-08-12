@@ -258,18 +258,66 @@
           <em>louder</em> can tell an owl a height and cannot tell you one.
         </p>
 
-        <h3 class="exhibit-heading">Why so lopsided?</h3>
+        <h3 class="exhibit-heading">Then why not just tilt your head?</h3>
 
         <p>
-          It is not enough for the ears to be uneven. Working a height out of the
-          loudness difference means dividing by how much that difference moves per
-          unit of height — and that divisor shrinks with the offset. So a nearly
-          level pair takes a small misreading and turns it into a wild answer. Slide
-          the offset down and watch what a single decibel of slop costs.
+          A fair objection, and the first one most people reach for. Tilt far enough
+          and one of your ears really is higher than the other — so why is that not
+          the same trick?
+        </p>
+
+        <p>
+          Because a tilt rotates both of your cues at once. Your ears are separated
+          left to right, so the timing difference reads left to right. Roll your head
+          ninety degrees and they are separated top to bottom — now the timing reads
+          height, and tells you nothing at all about left or right. You have
+          <em>swapped</em> which axis you can hear. You have not gained a second one.
+        </p>
+
+        <p>
+          An owl's asymmetry is not a tilt, and that is the whole of it. Its ears stay
+          on opposite sides of its head, so the timing cue stays on the horizontal
+          where it belongs. What is rotated is only <em>where each ear listens
+          hardest</em>. So the timing keeps answering left to right while the loudness
+          starts answering up and down — one cue per axis, from the same instant.
+        </p>
+
+        <p>
+          What does work is tilting <em>and listening again</em>. That is a second
+          reading from a new angle: one instrument, used twice. It is genuinely how
+          you place a sound above your head, and it is why you turn towards a noise
+          without deciding to. But it costs a second moment — and it needs the sound
+          to still be there when you take it. A mouse under snow rustles once, for a
+          fraction of a second, and does not oblige you with a repeat.
+        </p>
+
+        <p>
+          That is what the lopsided skull buys: it turns a two-step procedure into one
+          step. Barn owls do bob and swivel their heads, at length, when they have time
+          to. The asymmetry is for when they do not.
         </p>
 
         <div class="exhibit">
           <label class="exhibit-label" for="offset">Vertical offset between the ears</label>
+          <svg
+            class="exhibit-svg"
+            viewBox="0 0 200 132"
+            role="img"
+            aria-labelledby="offset-diagram-title"
+          >
+            <title id="offset-diagram-title">
+              A head seen from the front, with a cone from each ear showing where it
+              listens hardest. At zero offset both cones point straight out and mirror
+              each other. As the offset grows the left cone swings down and the right
+              swings up, while the ears themselves stay on opposite sides of the head.
+            </title>
+            <line class="diagram-level" x1="14" y1="66" x2="186" y2="66" />
+            <ellipse class="diagram-head" cx="100" cy="66" rx="40" ry="46" />
+            <path class="diagram-cone" id="offset-cone-left" d="M 62 66 L 6 48 L 6 84 Z" />
+            <path class="diagram-cone" id="offset-cone-right" d="M 138 66 L 194 48 L 194 84 Z" />
+            <ellipse class="diagram-ear" cx="62" cy="66" rx="6" ry="9" />
+            <ellipse class="diagram-ear" cx="138" cy="66" rx="6" ry="9" />
+          </svg>
           <input
             class="exhibit-slider"
             type="range"
@@ -286,6 +334,16 @@
           </div>
           <p class="exhibit-read" id="offset-read"></p>
         </div>
+
+        <h3 class="exhibit-heading">Why so lopsided?</h3>
+
+        <p>
+          It is not enough for the ears to be uneven. Working a height out of the
+          loudness difference means dividing by how much that difference moves per
+          unit of height — and that divisor shrinks with the offset. So a nearly
+          level pair takes a small misreading and turns it into a wild answer. Slide
+          the offset down and watch what a single decibel of slop costs.
+        </p>
 
         <p>
           Which is why a barn owl is not slightly lopsided. Evolution did not stop at

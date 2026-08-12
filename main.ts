@@ -69,6 +69,8 @@ const listenNote = need("listen-note");
 const offsetSlider = need<HTMLInputElement>("offset");
 const offsetBand = need("offset-band");
 const offsetRead = need("offset-read");
+const coneLeft = need("offset-cone-left");
+const coneRight = need("offset-cone-right");
 const status = need("status");
 
 const scoreCells: Record<EarMode, { hits: HTMLElement; strikes: HTMLElement; rate: HTMLElement }> = {
@@ -409,6 +411,13 @@ function onEarsChange(event: Event): void {
  */
 function renderOffset(): void {
   const degrees = Number(offsetSlider.value);
+
+  // Only the cones move: the ears stay on opposite sides of the head, which is the
+  // difference between an owl and a tilted head. Both rotate the same way about
+  // their own ear, which swings the left cone down and the right one up.
+  coneLeft.setAttribute("transform", `rotate(${-degrees} 62 66)`);
+  coneRight.setAttribute("transform", `rotate(${-degrees} 138 66)`);
+
   const spread = heightUncertainty(earsWithOffset(degrees), EAR_JITTER_DECIBELS);
 
   if (!Number.isFinite(spread)) {

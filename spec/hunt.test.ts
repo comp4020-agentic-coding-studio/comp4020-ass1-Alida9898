@@ -9,6 +9,7 @@ import {
   itd,
   itdMicroseconds,
   EAR_JITTER_DECIBELS,
+  earsMirrored,
   earsWithOffset,
   heightUncertainty,
   loudnessPerHeight,
@@ -237,6 +238,37 @@ describe("the asymmetry has to be large to be worth having", () => {
     );
     expect(resolvesHeight(earsWithOffset(0))).toBe(false);
     expect(resolvesHeight(earsWithOffset(1))).toBe(true);
+  });
+});
+
+// What this does and does not settle. It shows that aiming a pair WIDER buys no
+// height: sweep the lateral aim from nothing to eighty degrees and the loudness
+// difference still says only left-or-right. Only a difference in the VERTICAL aims
+// creates a second axis.
+//
+// It deliberately does not claim to answer the head-tilt objection, because this
+// model cannot: itd() is hardwired to azimuth and ignores the ears entirely, so a
+// rolled head — which rotates the timing cue's axis along with the loudness cue's —
+// is not representable here. The page answers that one in prose, and the answer is
+// that a roll swaps which axis you hear rather than adding one.
+describe("aiming the ears wider buys no height", () => {
+  for (const lateral of [0, 5, 20, 45, 80]) {
+    it(`recovers no height from a pair aimed ${lateral} degrees out but level`, () => {
+      const mirrored = earsMirrored(lateral);
+      expect(
+        resolvesHeight(mirrored),
+        `a pair aimed ${lateral} degrees out with no vertical difference reported a height; the second axis has to come from the vertical aims, not from splaying them further apart`,
+      ).toBe(false);
+      expect(infer(at(0.4, 0.6), mirrored).high).toBeNull();
+      expect(heightUncertainty(mirrored, EAR_JITTER_DECIBELS)).toBe(Number.POSITIVE_INFINITY);
+    });
+  }
+
+  it("recovers a height the moment the vertical aims differ, however slightly", () => {
+    expect(
+      resolvesHeight(earsWithOffset(0.5)),
+      "half a degree of vertical difference is a terrible instrument but it is an instrument; the cliff is at exactly zero",
+    ).toBe(true);
   });
 });
 

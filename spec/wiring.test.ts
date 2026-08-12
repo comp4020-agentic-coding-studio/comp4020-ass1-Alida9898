@@ -73,7 +73,10 @@ describe("the page puts the hunt before the explanation", () => {
 describe("the diagrams are legible to a screen reader", () => {
   it("gives each one a real accessible name", () => {
     const diagrams = [...document.querySelectorAll('svg[role="img"]')];
-    expect(diagrams.length, "expected the owl and human diagrams").toBe(2);
+    expect(
+      diagrams.length,
+      "expected at least the owl and human diagrams; the count is incidental, the naming below is the contract",
+    ).toBeGreaterThanOrEqual(2);
 
     for (const diagram of diagrams) {
       const labelId = diagram.getAttribute("aria-labelledby");
