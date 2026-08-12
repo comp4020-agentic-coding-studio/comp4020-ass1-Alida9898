@@ -74,6 +74,10 @@ describe("the page levels your ears once you have the hang of it", () => {
   it("stays out of the way until then", () => {
     expect(element("reveal").hidden, "the reveal fired before it was earned").toBe(true);
     expect(
+      element("curtain").hasAttribute("open"),
+      "the page interrupted the visitor before they had earned the turn",
+    ).toBe(false);
+    expect(
       document.querySelector<HTMLInputElement>("#ears-uneven")?.checked,
       "the hunt should open with an owl's ears",
     ).toBe(true);
@@ -100,6 +104,28 @@ describe("the page levels your ears once you have the hang of it", () => {
       document.querySelector<HTMLInputElement>("#ears-level")?.checked,
       "the reveal fired but the toggle still shows an owl's ears; the page and its own control disagree",
     ).toBe(true);
+  });
+
+  // An inline banner under the controls is too easy to play straight past, and
+  // this is the only turn the page has. It has to interrupt.
+  it("interrupts with a dialog rather than a line of text", () => {
+    expect(
+      element("curtain").hasAttribute("open"),
+      "the ears were levelled without stopping the visitor to say so",
+    ).toBe(true);
+    expect(element("curtain-heading").textContent).toContain("human");
+  });
+
+  it("gets out of the way again when dismissed", () => {
+    element("curtain-dismiss").click();
+    expect(
+      element("curtain").hasAttribute("open"),
+      "the dialog would not close, so the hunt is unreachable behind it",
+    ).toBe(false);
+    expect(
+      element("reveal").hidden,
+      "the lingering note should stay after the dialog goes, as the record of what changed",
+    ).toBe(false);
   });
 
   it("does not fire twice", () => {

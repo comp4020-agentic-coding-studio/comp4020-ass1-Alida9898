@@ -43,6 +43,8 @@ const fieldAim = need("field-aim");
 const fieldPrey = need("field-prey");
 const fieldMarks = need("field-marks");
 const reveal = need("reveal");
+const curtain = need<HTMLDialogElement>("curtain");
+const curtainDismiss = need("curtain-dismiss");
 const gaugeV = need("gauge-v");
 const soundV = need("v-sound");
 const aimV = need("v-aim");
@@ -205,6 +207,27 @@ function renderMarks(): void {
   }
 }
 
+// jsdom implements HTMLDialogElement but not showModal/close, so both paths fall
+// back to the open attribute. Chrome gets the real thing: backdrop, focus trap,
+// Esc to dismiss.
+
+function raiseCurtain(): void {
+  if (typeof curtain.showModal === "function") {
+    curtain.showModal();
+  } else {
+    curtain.setAttribute("open", "");
+  }
+}
+
+function dropCurtain(): void {
+  if (typeof curtain.close === "function") {
+    curtain.close();
+  } else {
+    curtain.removeAttribute("open");
+  }
+  field.focus();
+}
+
 /** Switch ears, from the radio or from the page's own hand. */
 function setEars(next: EarMode): void {
   mode = next;
@@ -266,6 +289,7 @@ function strike(): void {
       levelledForYou = true;
       reveal.hidden = false;
       setEars("level");
+      raiseCurtain();
       return;
     }
 
@@ -335,6 +359,8 @@ field.addEventListener("pointerup", onPointerUp);
 field.addEventListener("pointercancel", onPointerUp);
 field.addEventListener("keydown", onKeyDown);
 strikeButton.addEventListener("click", strike);
+curtainDismiss.addEventListener("click", dropCurtain);
+curtain.addEventListener("close", () => field.focus());
 
 for (const input of document.querySelectorAll<HTMLInputElement>('input[name="ears"]')) {
   input.addEventListener("change", onEarsChange);

@@ -365,7 +365,36 @@ footer {
   color: var(--muted);
 }
 
-/* The moment the page levels your ears for you. */
+/* The moment the page levels your ears for you. It has to interrupt: an inline
+   banner under the controls is too easy to play straight past, and this is the
+   only turn the page has. */
+
+.curtain {
+  max-width: 27rem;
+  padding: 1.6rem 1.7rem;
+  color: var(--ink);
+  background: #12161e;
+  border: 1px solid var(--amber);
+  border-radius: 0.6rem;
+}
+
+.curtain::backdrop {
+  background: rgb(5 7 10 / 80%);
+}
+
+.curtain-heading {
+  margin: 0 0 0.9rem;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
+  color: var(--amber);
+}
+
+.curtain-cue {
+  margin: 0 0 1.3rem;
+  color: var(--muted);
+}
+
+/* The lingering trace, once the curtain is dismissed. */
 
 .reveal {
   margin: 1.5rem 0 0;
