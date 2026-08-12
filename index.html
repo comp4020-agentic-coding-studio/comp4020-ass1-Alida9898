@@ -3,22 +3,166 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>COMP4020 prototype</title>
+    <title>The Owl's Uneven Ears</title>
+    <meta
+      name="description"
+      content="A barn owl's two ear openings point in different directions. Hunt in the dark, then level the ears and watch your hit rate collapse."
+    />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header>
       <nav aria-label="Primary">
-        <a href="./">Home</a>
+        <a href="./">The owl's uneven ears</a>
       </nav>
     </header>
+
     <main>
-      <h1>COMP4020 prototype</h1>
-      <p data-testid="intro">
-        Replace this with your prototype. This week's brief is on the course website;
-        <code>spec/README.md</code> explains how the checks in this repo relate to it.
+      <h1>An owl's ears are uneven. That is the whole trick.</h1>
+
+      <p class="lede">
+        A barn owl drops onto a mouse it has never seen — in the dark, under snow.
+        Not because its eyes are extraordinary. Because its two ear openings point
+        in different directions: the left one aimed down, the right one aimed up.
       </p>
+
+      <p>
+        Almost every animal with two ears can tell left from right. Sound reaches
+        the near ear first, and the gap between the two arrivals is the direction.
+        But that gap says nothing about <em>height</em> — every point directly above
+        another gives an identical reading. Uneven ears are how the owl gets the
+        second axis, and they are why it can hit something it cannot see.
+      </p>
+
+      <p>So: you are the owl. It is dark. You have two cues and nothing else.</p>
+
+      <section class="hunt" aria-labelledby="hunt-heading">
+        <h2 id="hunt-heading">Hunt</h2>
+
+        <div
+          class="field"
+          id="field"
+          tabindex="0"
+          aria-label="Hunting field. Drag to aim, or move your aim with the arrow keys and press Enter to strike."
+        >
+          <div class="field-grid" aria-hidden="true"></div>
+          <div class="field-aim" id="field-aim" aria-hidden="true"></div>
+          <div class="field-prey" id="field-prey" aria-hidden="true" hidden></div>
+        </div>
+
+        <p class="field-hint">
+          Drag inside the field to aim. On a keyboard: focus the field, use the
+          arrow keys, then press Enter.
+        </p>
+
+        <div class="cues">
+          <div class="cue">
+            <h3>Left or right</h3>
+            <p class="cue-kind">which ear hears it first</p>
+            <div class="track" aria-hidden="true">
+              <div class="track-line"></div>
+              <div class="pulse" id="pulse-left" data-ear="L"></div>
+              <div class="pulse" id="pulse-right" data-ear="R"></div>
+            </div>
+            <p class="cue-read" id="read-timing">—</p>
+          </div>
+
+          <div class="cue">
+            <h3>Up or down</h3>
+            <p class="cue-kind">which ear hears it louder</p>
+            <div class="bars" aria-hidden="true">
+              <div class="bar">
+                <span class="bar-ear">L</span>
+                <span class="bar-rail"><span class="bar-fill" id="bar-left"></span></span>
+              </div>
+              <div class="bar">
+                <span class="bar-ear">R</span>
+                <span class="bar-rail"><span class="bar-fill" id="bar-right"></span></span>
+              </div>
+            </div>
+            <p class="cue-read" id="read-loudness">—</p>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button type="button" class="strike" id="strike">Strike</button>
+          <p class="status" id="status" role="status">Aim, then strike.</p>
+        </div>
+
+        <fieldset class="ears">
+          <legend>Ears</legend>
+          <label>
+            <input type="radio" name="ears" value="uneven" id="ears-uneven" checked />
+            <span>Uneven <small>a real barn owl</small></span>
+          </label>
+          <label>
+            <input type="radio" name="ears" value="level" id="ears-level" />
+            <span>Level <small>both aimed straight ahead</small></span>
+          </label>
+        </fieldset>
+
+        <table class="score">
+          <caption>Your hit rate, kept separately for each pair of ears</caption>
+          <thead>
+            <tr>
+              <th scope="col">Ears</th>
+              <th scope="col">Hits</th>
+              <th scope="col">Strikes</th>
+              <th scope="col">Rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Uneven</th>
+              <td id="uneven-hits">0</td>
+              <td id="uneven-strikes">0</td>
+              <td id="uneven-rate">—</td>
+            </tr>
+            <tr>
+              <th scope="row">Level</th>
+              <td id="level-hits">0</td>
+              <td id="level-strikes">0</td>
+              <td id="level-rate">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section aria-labelledby="why-heading">
+        <h2 id="why-heading">What just happened</h2>
+
+        <p>
+          Level the ears and the loudness meter keeps moving. It still leans left
+          and right, because the ears are still on opposite sides of the head. What
+          it no longer does is tell you anything about height — the reading at the
+          top of the field is identical to the reading at the bottom. Not weaker.
+          Identical.
+        </p>
+
+        <p>
+          That is the part worth taking away. The cue did not get noisier, and
+          nothing looked broken. A meter that moves is not the same as a meter that
+          knows. You were guessing the vertical the whole time, and the scoreboard
+          is where you found out.
+        </p>
+
+        <p>
+          Aiming an ear is what makes it a measuring instrument. Two ears aimed the
+          same way are one instrument used twice; aim them apart and the pair
+          answers a question neither could answer alone. The owl's skull is
+          asymmetric for exactly one reason, and it is the reason it eats.
+        </p>
+      </section>
     </main>
+
+    <footer>
+      <p>
+        Built for COMP4020. The acoustics are simplified — separable cues, no
+        head-shadow, no ruff — but the asymmetry, and what levelling it costs, are
+        real.
+      </p>
+    </footer>
+
     <script type="module" src="./main.ts"></script>
   </body>
 </html>
