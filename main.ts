@@ -70,14 +70,18 @@ const KEY_STEP = 0.04;
 const REVEAL_MS = 1400;
 
 /**
- * Hits with an owl's ears before the page levels them for you.
+ * Hits in a row with an owl's ears before the page levels them for you.
+ *
+ * A run rather than a running total, because the turn should land the moment you
+ * feel reliable — and three lucky hits scattered through a dozen misses is not
+ * that. A miss puts you back to zero.
  *
  * The toggle was always there, but a control you choose to flip is not a
- * surprise, and the whole point lands harder when it happens TO you — right
- * after you have started to feel competent. Only fires if you have not already
- * found the toggle yourself; once you have, the surprise is spent.
+ * surprise, and the point lands harder when it happens TO you. Only fires if you
+ * have not already found the toggle yourself; once you have, the surprise is
+ * spent.
  */
-const HITS_BEFORE_LEVELLING = 5;
+const STREAK_BEFORE_LEVELLING = 3;
 
 /** Marks kept on the field. Enough to see the pattern, not enough to smother it. */
 const MAX_MARKS = 60;
@@ -104,6 +108,7 @@ let revealing = false;
 let dragging = false;
 let chosenByVisitor = false;
 let levelledForYou = false;
+let streak = 0;
 
 interface Mark {
   readonly at: Point;
@@ -231,6 +236,7 @@ function dropCurtain(): void {
 /** Switch ears, from the radio or from the page's own hand. */
 function setEars(next: EarMode): void {
   mode = next;
+  streak = 0;
   const input = document.querySelector<HTMLInputElement>(`#ears-${next}`);
   if (input) {
     input.checked = true;
@@ -254,6 +260,7 @@ function strike(): void {
   if (hit) {
     current.hits += 1;
   }
+  streak = hit ? streak + 1 : 0;
 
   marks[mode].push({ at: prey, hit });
   if (marks[mode].length > MAX_MARKS) {
@@ -283,7 +290,7 @@ function strike(): void {
       mode === "uneven" &&
       !chosenByVisitor &&
       !levelledForYou &&
-      tally.uneven.hits >= HITS_BEFORE_LEVELLING;
+      streak >= STREAK_BEFORE_LEVELLING;
 
     if (readyToLevel) {
       levelledForYou = true;
