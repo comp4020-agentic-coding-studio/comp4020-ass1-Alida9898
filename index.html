@@ -18,6 +18,24 @@
     </header>
 
     <main>
+      <div class="hero" aria-hidden="true">
+        <svg class="hero-owl" viewBox="0 0 260 152">
+          <g class="owl-body">
+            <path d="M 118 66 C 92 46 52 30 12 38 C 38 54 68 72 92 86 C 104 93 114 80 118 70 Z" />
+            <path d="M 142 66 C 168 46 208 30 248 38 C 222 54 192 72 168 86 C 156 93 146 80 142 70 Z" />
+            <path d="M 130 54 C 143 54 151 70 151 92 C 151 114 143 130 130 130 C 117 130 109 114 109 92 C 109 70 117 54 130 54 Z" />
+            <path d="M 130 68 C 114 58 108 43 108 32 C 108 19 118 13 130 23 C 142 13 152 19 152 32 C 152 43 146 58 130 68 Z" />
+          </g>
+          <g class="owl-talon">
+            <path d="M 123 128 L 120 141" />
+            <path d="M 137 128 L 140 141" />
+          </g>
+          <circle class="owl-eye" cx="122" cy="34" r="3.4" />
+          <circle class="owl-eye" cx="138" cy="34" r="3.4" />
+          <path class="owl-beak" d="M 130 39 L 126.5 47 L 133.5 47 Z" />
+        </svg>
+      </div>
+
       <h1>An owl's ears are uneven. Yours are not.</h1>
 
       <p class="lede">
@@ -58,7 +76,15 @@
             <div class="field-grid" aria-hidden="true"></div>
             <div class="field-marks" id="field-marks" aria-hidden="true"></div>
             <div class="field-aim" id="field-aim" aria-hidden="true"></div>
-            <div class="field-prey" id="field-prey" aria-hidden="true" hidden></div>
+            <div class="field-prey" id="field-prey" aria-hidden="true" hidden>
+              <svg viewBox="0 0 26 16">
+                <path class="mouse-tail" d="M 19 9 C 24.5 9 24.5 3 21.5 1.8" />
+                <ellipse class="mouse-body" cx="11" cy="9.2" rx="8.4" ry="5.4" />
+                <circle class="mouse-body" cx="6" cy="4.6" r="3.5" />
+                <circle class="mouse-eye" cx="6.2" cy="8.8" r="1" />
+                <circle class="mouse-eye" cx="2.9" cy="9.8" r="0.9" />
+              </svg>
+            </div>
           </div>
 
           <div class="gauge gauge-h" id="gauge-h" aria-hidden="true">
@@ -261,22 +287,13 @@
         <h3 class="exhibit-heading">Then why not just tilt your head?</h3>
 
         <p>
-          A fair objection, and the first one most people reach for. Tilt your head
-          twenty-five degrees and one ear really is higher than the other — the same
-          twenty-five degrees a barn owl has. So what is different?
-        </p>
-
-        <p>
-          <strong>What moved.</strong> A tilt takes your ear positions round with it,
-          and your ear positions are what set the timing axis. So both cues turn
-          together and stay parallel: timing and loudness go on answering the same
-          question, just a question rotated twenty-five degrees off horizontal.
-        </p>
-
-        <p>
-          An owl's offset moves only <em>where each ear listens hardest</em>. Its ears
-          stay on opposite sides of its head, so the timing stays horizontal while the
-          loudness swings vertical. Same angle — one thing moved instead of two.
+          Tilt twenty-five degrees and one ear really is higher than the other — the
+          same twenty-five degrees a barn owl has. The difference is <em>what
+          moved</em>. A tilt carries your ear positions round with it, and positions
+          are what set the timing axis, so both cues turn together and stay parallel.
+          An owl's offset moves only where each ear listens hardest. Its ears stay on
+          opposite sides of its head, so timing stays horizontal while loudness swings
+          vertical.
         </p>
 
         <p class="pull">
@@ -285,26 +302,20 @@
         </p>
 
         <p>
-          That difference has a price you can count. Tilted twenty-five degrees, there
-          are pairs of places nearly ten target widths apart that reach your ears with
-          exactly the same timing <em>and</em> exactly the same loudness — no way to
-          tell them apart, from either cue. Hand the same twenty-five degrees to an
-          owl and it hears those two places differently.
+          Tilted twenty-five degrees, there are places nearly ten target widths apart
+          that reach your ears with identical timing <em>and</em> identical loudness.
+          An owl at the same twenty-five degrees hears them apart. Tilting and
+          listening again does work — one instrument used twice — but it costs a
+          second moment, and a mouse under snow rustles once.
         </p>
 
-        <p>
-          What does work is tilting <em>and listening again</em>. That is a second
-          reading from a new angle: one instrument, used twice. It is genuinely how
-          you place a sound above your head, and it is why you turn towards a noise
-          without deciding to. But it costs a second moment — and it needs the sound
-          to still be there when you take it. A mouse under snow rustles once, for a
-          fraction of a second, and does not oblige you with a repeat.
-        </p>
+        <h3 class="exhibit-heading">Why so lopsided?</h3>
 
         <p>
-          That is what the lopsided skull buys: it turns a two-step procedure into one
-          step. Barn owls do bob and swivel their heads, at length, when they have time
-          to. The asymmetry is for when they do not.
+          Working a height out of the loudness difference means dividing by how much
+          that difference moves per unit of height — and that divisor shrinks with the
+          offset, so a nearly level pair turns a small misreading into a wild answer.
+          Slide it down and watch what one decibel of slop costs.
         </p>
 
         <div class="exhibit">
@@ -345,32 +356,12 @@
           <p class="exhibit-read" id="offset-read"></p>
         </div>
 
-        <h3 class="exhibit-heading">Why so lopsided?</h3>
-
         <p>
-          It is not enough for the ears to be uneven. Working a height out of the
-          loudness difference means dividing by how much that difference moves per
-          unit of height — and that divisor shrinks with the offset. So a nearly
-          level pair takes a small misreading and turns it into a wild answer. Slide
-          the offset down and watch what a single decibel of slop costs.
-        </p>
-
-        <p>
-          Which is why a barn owl is not slightly lopsided. Evolution did not stop at
-          two degrees, because two degrees is not a measurement. (The hunt above is
-          noiseless — real ears are not, and height is the coarser of an owl's two
-          axes even at full offset.)
-        </p>
-
-        <p>
-          If you pressed <strong>Listen</strong>, you have already run the experiment
-          on yourself. The timing difference arrived as a direction, unmistakably,
-          without any effort on your part. The loudness difference arrived as a
-          <em>lean to one side</em> — because it was played into your ears, and a
-          level pair has nowhere else to put it. An owl's height cue, delivered to
-          human ears, comes out as left and right. You cannot hear it as height. That
-          is not the simulation falling short; it is the whole argument, in a form
-          you can check without reading another word.
+          If you pressed <strong>Listen</strong>, you already ran this on yourself.
+          The timing arrived as a direction without any effort. The loudness arrived
+          as a lean to one side — because it was played into your ears, and a level
+          pair has nowhere else to put it. An owl's height cue, delivered to human
+          ears, comes out as left and right.
         </p>
       </section>
 
@@ -378,54 +369,36 @@
         <h2 id="why-heading">What just happened to you</h2>
 
         <p>
-          With an owl's ears, two facts and two axes give one place. That is not a
-          knack you picked up — it is arithmetic the shape of its skull does for it,
-          before it has moved a muscle.
+          Notice what did <em>not</em> happen when the ears were levelled: they did not
+          go quiet. They still reported a difference in loudness, and it was still a
+          real measurement — the number stayed on screen the whole time. What broke was
+          the step after it. There was no height for it to be pointing at.
         </p>
 
         <p>
-          Then the second fact folded back into the first. Notice what did
-          <em>not</em> happen: the ears did not go quiet. They still report a
-          difference in loudness, and it is still a real measurement — the number
-          stayed on screen the whole time. What broke is the step after it. Aim both
-          ears the same way and the loudness difference stops varying with height at
-          all, so there is no height for it to be pointing at. Solve for one and the
-          term is gone.
-        </p>
-
-        <p>
-          So the second half was not a worse instrument. It was one instrument fewer
-          — and it was <em>you</em>. Those are your ears. You have had them your
-          whole life, you have never once placed a sound by height by comparing them,
-          and until you missed a mouse in the dark you had no reason to notice.
-        </p>
-
-        <p>
-          Look at the marks on the field. Under your own ears the green ones sit in a
-          band at whatever height you kept guessing, and the red ones fill in
-          everywhere else. Left and right were perfect all along, which is why every
-          miss was vertical.
+          So the second half was not a worse instrument. It was one instrument fewer —
+          and it was <em>you</em>. Those are your ears. You have had them your whole
+          life, you have never once placed a sound by height by comparing them, and
+          until you missed a mouse in the dark you had no reason to notice. Look at the
+          marks: your green ones sit in a band at whatever height you kept guessing.
+          Left and right were perfect all along, which is why every miss was vertical.
         </p>
 
         <p>
           Aiming an ear is what turns it into a measuring instrument along that axis.
-          Two ears pointed the same way are one instrument used twice; point them
-          apart and the pair answers a question neither could answer alone. A barn
-          owl's skull is lopsided for exactly one reason, and it is the reason it
-          eats.
+          Two ears pointed the same way are one instrument used twice. A barn owl's
+          skull is lopsided for exactly one reason, and it is the reason it eats.
         </p>
       </section>
     </main>
 
     <footer>
       <p>
-        Built for COMP4020. The acoustics are simplified — separable cues, no head
-        shadow, no facial ruff — and the diagrams are schematics, not anatomy. In
-        fairness to your own ears: the folds of the outer ear do give you a crude
-        sense of elevation, by filtering a sound differently depending on where it
-        comes from. That is a separate trick, it works one ear at a time, and it is
-        nothing like as sharp. The comparison between your two ears really does say
-        nothing about height.
+        Built for COMP4020. Simplified acoustics, schematic diagrams. In fairness to
+        your ears: the folds of the outer ear do give you a crude sense of elevation,
+        by filtering a sound depending on where it comes from — a separate trick, one
+        ear at a time, nowhere near as sharp. The comparison <em>between</em> your two
+        ears really does say nothing about height.
       </p>
     </footer>
 
