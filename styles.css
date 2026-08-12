@@ -188,6 +188,20 @@ footer {
   box-shadow: 0 0 0 0.5rem rgb(240 102 78 / 22%);
 }
 
+/* Announced, never shown: where the aim sits relative to the sound. Sighted
+   visitors read that off the gauges; without it a keyboard user can reach the
+   field and still be aiming blind. */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .field-hint {
   margin: 0.75rem 0 2rem;
   font-size: 0.85rem;

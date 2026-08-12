@@ -21,6 +21,7 @@ import {
   distance,
   ild,
   infer,
+  type Inference,
   isHit,
   itdMicroseconds,
   randomPrey,
@@ -55,6 +56,7 @@ const readLoudness = need("read-loudness");
 const figureTiming = need("figure-timing");
 const figureLoudness = need("figure-loudness");
 const loudnessKind = need("loudness-kind");
+const bearing = need("bearing");
 const strikeButton = need<HTMLButtonElement>("strike");
 const status = need("status");
 
@@ -132,6 +134,30 @@ function describe(point: Point): string {
   return `${vertical}, ${lateral}`;
 }
 
+/**
+ * Where the sound sits relative to the aim, in words.
+ *
+ * The gauges are aria-hidden decoration and the cue readouts only describe the
+ * sound, so without this a keyboard user can tab to the field, hear what it is,
+ * and still have no way to know which direction to move. Announced per keypress,
+ * which is one update per deliberate action rather than chatter.
+ */
+function bearingText(heard: Inference): string {
+  const step = 0.05;
+  const across =
+    heard.across - aim.x > step ? "right" : aim.x - heard.across > step ? "left" : null;
+
+  if (heard.high === null) {
+    const lateral = across === null ? "lined up left to right" : `${across} of your aim`;
+    return `Sound ${lateral}. Height unknown with level ears.`;
+  }
+
+  const high = heard.high - aim.y > step ? "above" : aim.y - heard.high > step ? "below" : null;
+  if (across === null && high === null) return "Aim is on the sound.";
+  const parts = [high, across].filter((part) => part !== null);
+  return `Sound ${parts.join(" and ")} your aim.`;
+}
+
 function render(): void {
   const ears = EAR_MODES[mode];
   const heard = infer(prey, ears);
@@ -182,6 +208,8 @@ function render(): void {
     figureLoudness.textContent = "The right ear points up, so the difference gives the height.";
     delete readLoudness.dataset.blind;
   }
+
+  bearing.textContent = bearingText(heard);
 
   for (const key of ["uneven", "level"] as const) {
     const { hits, strikes } = tally[key];
