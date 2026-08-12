@@ -177,81 +177,86 @@ footer {
   color: var(--muted);
 }
 
-.track {
+.gauge {
   position: relative;
-  height: 2.5rem;
+  height: 2.25rem;
 }
 
-.track-line {
+.gauge-rail {
   position: absolute;
   top: 50%;
   right: 0;
   left: 0;
-  height: 1px;
+  height: 2px;
   background: var(--line);
+  border-radius: 1px;
 }
 
-.pulse {
+/* The hollow ring is what the owl hears; the filled dot is what your aim would
+   hear. Lining them up is the whole task, so they have to read as one thing
+   landing inside another. */
+
+.gauge-target {
   position: absolute;
-  top: 0.35rem;
-  width: 2px;
-  height: 1.1rem;
-  margin-left: -1px;
+  top: 50%;
+  width: 1.4rem;
+  height: 1.4rem;
+  margin: -0.7rem 0 0 -0.7rem;
+  border: 2px solid var(--warm);
+  border-radius: 50%;
+  transition: left 220ms ease-out;
+}
+
+.gauge-needle {
+  position: absolute;
+  top: 50%;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin: -0.3rem 0 0 -0.3rem;
   background: var(--amber);
-  transition: left 200ms ease-out;
+  border-radius: 50%;
 }
 
-.pulse::after {
-  position: absolute;
-  top: 1.3rem;
-  left: 50%;
+.gauge-ends {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.15rem 0 0;
   font-size: 0.7rem;
   color: var(--muted);
-  transform: translateX(-50%);
-  content: attr(data-ear);
-}
-
-.bars {
-  display: grid;
-  gap: 0.4rem;
-}
-
-.bar {
-  display: flex;
-  gap: 0.6rem;
-  align-items: center;
-}
-
-.bar-ear {
-  width: 1rem;
-  font-size: 0.75rem;
-  color: var(--muted);
-}
-
-.bar-rail {
-  display: block;
-  flex: 1;
-  height: 0.65rem;
-  background: rgb(255 255 255 / 5%);
-  border-radius: 0.35rem;
-}
-
-.bar-fill {
-  display: block;
-  height: 100%;
-  background: var(--amber);
-  border-radius: 0.35rem;
-  transition: width 200ms ease-out;
 }
 
 .cue-read {
-  margin: 0.7rem 0 0;
-  font-size: 0.9rem;
+  margin: 0.6rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 500;
   color: var(--ink);
 }
 
 .cue-read[data-blind="true"] {
   color: var(--warm);
+}
+
+.cue-figure {
+  margin: 0.15rem 0 0;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.lock {
+  margin: 2rem 0 0;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  background: rgb(255 255 255 / 3%);
+  border-left: 2px solid var(--line);
+  border-radius: 0.25rem;
+}
+
+.lock[data-locked="true"] {
+  color: var(--ink);
+  background: rgb(224 162 68 / 12%);
+  border-left-color: var(--amber);
 }
 
 .controls {
@@ -346,8 +351,7 @@ footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pulse,
-  .bar-fill {
+  .gauge-target {
     transition: none;
   }
 }

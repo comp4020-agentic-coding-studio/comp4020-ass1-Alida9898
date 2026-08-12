@@ -7,7 +7,9 @@ import {
   isHit,
   itd,
   itdMicroseconds,
+  loudnessAgrees,
   type Point,
+  timingAgrees,
 } from "../acoustics";
 
 // This week's spec, as tests. The published brief asks for a core interaction
@@ -123,6 +125,56 @@ describe("a strike either lands or it does not", () => {
       areaOfTarget / areaOfField,
       "a blind strike should land well under a tenth of the time, or the toggle has nothing to reveal",
     ).toBeLessThan(0.1);
+  });
+});
+
+// The visitor's actual task is to move their aim until both readings line up with
+// what they are hearing. So the sharpest form of this page's claim is about what
+// lining both up is WORTH: with uneven ears it pins the prey down, and with
+// levelled ears the instruments can agree while the aim is still wildly wrong.
+describe("lining both readings up is what pins the prey down", () => {
+  const prey: Point = { x: 0.4, y: 0.55 };
+
+  /** Every aim the visitor could plausibly settle on. */
+  const grid: Point[] = samples(41).flatMap((x) => samples(41).map((y) => at(x, y)));
+
+  function agreeingAims(mode: "uneven" | "level"): Point[] {
+    return grid.filter(
+      (candidate) =>
+        timingAgrees(candidate, prey) && loudnessAgrees(candidate, prey, EAR_MODES[mode]),
+    );
+  }
+
+  it("leaves only one place to be when the ears are uneven", () => {
+    const aims = agreeingAims("uneven");
+    expect(aims.length, "no aim satisfied both cues; the task would be impossible").toBeGreaterThan(
+      0,
+    );
+    for (const candidate of aims) {
+      expect(
+        isHit(candidate, prey),
+        `both readings agreed at (${candidate.x.toFixed(2)}, ${candidate.y.toFixed(2)}) but the strike would miss prey at (${prey.x}, ${prey.y}); uneven ears must make a matched aim a correct aim`,
+      ).toBe(true);
+    }
+  });
+
+  it("leaves the whole height of the field open when the ears are levelled", () => {
+    const aims = agreeingAims("level");
+    const heights = aims.map((candidate) => candidate.y);
+    const spread = Math.max(...heights) - Math.min(...heights);
+    expect(
+      spread,
+      `levelled ears narrowed the matching aims to ${spread.toFixed(2)} of the field's height; the vertical must be left entirely free`,
+    ).toBeGreaterThan(1.5);
+  });
+
+  it("lets the instruments agree and the strike miss anyway", () => {
+    const aims = agreeingAims("level");
+    const misses = aims.filter((candidate) => !isHit(candidate, prey));
+    expect(
+      misses.length / aims.length,
+      "most aims that satisfy both levelled readings should still miss — that gap is the entire argument of the page",
+    ).toBeGreaterThan(0.5);
   });
 });
 

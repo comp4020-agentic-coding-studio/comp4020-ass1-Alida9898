@@ -6,7 +6,7 @@
     <title>The Owl's Uneven Ears</title>
     <meta
       name="description"
-      content="A barn owl's two ear openings point in different directions. Hunt in the dark, then level the ears and watch your hit rate collapse."
+      content="A barn owl's two ear openings point in different directions. Hunt in the dark by matching what your ears hear, then level them and watch your hit rate collapse."
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
@@ -28,13 +28,19 @@
 
       <p>
         Almost every animal with two ears can tell left from right. Sound reaches
-        the near ear first, and the gap between the two arrivals is the direction.
-        But that gap says nothing about <em>height</em> — every point directly above
-        another gives an identical reading. Uneven ears are how the owl gets the
-        second axis, and they are why it can hit something it cannot see.
+        the nearer ear a fraction sooner, and that head start <em>is</em> the
+        direction. But it says nothing about <em>height</em> — a mouse above you
+        and a mouse below you arrive at both ears alike. Uneven ears are how the owl
+        gets the second axis, and they are why it can hit what it cannot see.
       </p>
 
-      <p>So: you are the owl. It is dark. You have two cues and nothing else.</p>
+      <p>
+        So: you are the owl, and it is dark. You have two readings, and no numbers
+        to work out. Each one shows what you are <strong>hearing</strong> and what
+        you <strong>would</strong> hear from where you are aiming. Move your aim
+        until the two line up — which is exactly what an owl is doing when it turns
+        its head towards a sound.
+      </p>
 
       <section class="hunt" aria-labelledby="hunt-heading">
         <h2 id="hunt-heading">Hunt</h2>
@@ -52,37 +58,46 @@
 
         <p class="field-hint">
           Drag inside the field to aim. On a keyboard: focus the field, use the
-          arrow keys, then press Enter.
+          arrow keys, then press Enter to strike.
         </p>
 
         <div class="cues">
           <div class="cue">
-            <h3>Left or right</h3>
-            <p class="cue-kind">which ear hears it first</p>
-            <div class="track" aria-hidden="true">
-              <div class="track-line"></div>
-              <div class="pulse" id="pulse-left" data-ear="L"></div>
-              <div class="pulse" id="pulse-right" data-ear="R"></div>
+            <h3>Which ear hears it first</h3>
+            <p class="cue-kind">the head start tells you left from right</p>
+            <div class="gauge" aria-hidden="true">
+              <span class="gauge-rail"></span>
+              <span class="gauge-target" id="target-timing"></span>
+              <span class="gauge-needle" id="needle-timing"></span>
             </div>
+            <p class="gauge-ends" aria-hidden="true">
+              <span>left ear first</span>
+              <span>right ear first</span>
+            </p>
             <p class="cue-read" id="read-timing">—</p>
+            <p class="cue-figure" id="figure-timing" aria-hidden="true"></p>
           </div>
 
           <div class="cue">
-            <h3>Up or down</h3>
-            <p class="cue-kind">which ear hears it louder</p>
-            <div class="bars" aria-hidden="true">
-              <div class="bar">
-                <span class="bar-ear">L</span>
-                <span class="bar-rail"><span class="bar-fill" id="bar-left"></span></span>
-              </div>
-              <div class="bar">
-                <span class="bar-ear">R</span>
-                <span class="bar-rail"><span class="bar-fill" id="bar-right"></span></span>
-              </div>
+            <h3>Which ear hears it louder</h3>
+            <p class="cue-kind" id="loudness-kind">
+              each ear is deafest away from where it points
+            </p>
+            <div class="gauge" aria-hidden="true">
+              <span class="gauge-rail"></span>
+              <span class="gauge-target" id="target-loudness"></span>
+              <span class="gauge-needle" id="needle-loudness"></span>
             </div>
+            <p class="gauge-ends" aria-hidden="true">
+              <span>left ear louder</span>
+              <span>right ear louder</span>
+            </p>
             <p class="cue-read" id="read-loudness">—</p>
+            <p class="cue-figure" id="figure-loudness" aria-hidden="true"></p>
           </div>
         </div>
+
+        <p class="lock" id="lock" aria-live="polite">Both readings still off.</p>
 
         <div class="controls">
           <button type="button" class="strike" id="strike">Strike</button>
@@ -93,11 +108,11 @@
           <legend>Ears</legend>
           <label>
             <input type="radio" name="ears" value="uneven" id="ears-uneven" checked />
-            <span>Uneven <small>a real barn owl</small></span>
+            <span>Uneven <small>a real barn owl: left aimed down, right aimed up</small></span>
           </label>
           <label>
             <input type="radio" name="ears" value="level" id="ears-level" />
-            <span>Level <small>both aimed straight ahead</small></span>
+            <span>Level <small>same head, both ears aimed straight ahead</small></span>
           </label>
         </fieldset>
 
@@ -132,34 +147,43 @@
         <h2 id="why-heading">What just happened</h2>
 
         <p>
-          Level the ears and the loudness meter keeps moving. It still leans left
-          and right, because the ears are still on opposite sides of the head. What
-          it no longer does is tell you anything about height — the reading at the
-          top of the field is identical to the reading at the bottom. Not weaker.
+          With uneven ears you could always find it. Two readings, two unknowns —
+          line both up and there is exactly one place the mouse can be. That is not
+          a knack you developed. It is arithmetic the shape of the owl's head does
+          for it.
+        </p>
+
+        <p>
+          Level the ears and the loudness reading keeps working. It still swings,
+          you can still line it up, and it still tells you when you have matched it
+          — because the ears are still on opposite sides of a head. What it has
+          stopped doing is saying anything about height. The reading at the top of
+          the field is identical to the reading at the bottom. Not weaker.
           Identical.
         </p>
 
         <p>
-          That is the part worth taking away. The cue did not get noisier, and
-          nothing looked broken. A meter that moves is not the same as a meter that
-          knows. You were guessing the vertical the whole time, and the scoreboard
-          is where you found out.
+          So the instrument told you that you were on target, and you were not. That
+          is the part worth keeping: a reading that responds is not the same as a
+          reading that <em>knows</em>. Nothing looked broken, nothing got noisier,
+          and you were guessing the height every single time. The scoreboard is
+          where you found out.
         </p>
 
         <p>
-          Aiming an ear is what makes it a measuring instrument. Two ears aimed the
-          same way are one instrument used twice; aim them apart and the pair
-          answers a question neither could answer alone. The owl's skull is
-          asymmetric for exactly one reason, and it is the reason it eats.
+          Aiming an ear is what turns it into a measuring instrument. Two ears
+          pointed the same way are one instrument used twice; point them apart and
+          the pair answers a question neither could answer alone. The owl's skull is
+          lopsided for exactly one reason, and it is the reason it eats.
         </p>
       </section>
     </main>
 
     <footer>
       <p>
-        Built for COMP4020. The acoustics are simplified — separable cues, no
-        head-shadow, no ruff — but the asymmetry, and what levelling it costs, are
-        real.
+        Built for COMP4020. The acoustics are simplified — separable cues, no head
+        shadow, no facial ruff, and each reading is scaled to fill its own gauge —
+        but the asymmetry, and what levelling it costs you, are real.
       </p>
     </footer>
 

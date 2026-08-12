@@ -124,6 +124,46 @@ export function ild(prey: Point, ears: EarConfig): number {
   return earLevel(prey, ears.right) - earLevel(prey, ears.left);
 }
 
+/** The widest timing difference the field can produce, for use as a full scale. */
+export function timingFullScale(): number {
+  return Math.abs(itd({ x: 1, y: 0 }));
+}
+
+/** The widest loudness difference this pair of ears can produce over the field. */
+export function loudnessFullScale(ears: EarConfig): number {
+  const corners: Point[] = [
+    { x: 1, y: 1 },
+    { x: 1, y: -1 },
+    { x: -1, y: 1 },
+    { x: -1, y: -1 },
+  ];
+  return Math.max(...corners.map((corner) => Math.abs(ild(corner, ears))));
+}
+
+// A reading normalised to roughly -1..1 puts both cues on one scale, so "these
+// two readings agree" means the same thing to the gauge on screen and to the
+// tests. Two definitions of matched would eventually disagree, and the one on
+// screen is the one the visitor would believe.
+
+export function timingReading(point: Point): number {
+  return itd(point) / timingFullScale();
+}
+
+export function loudnessReading(point: Point, ears: EarConfig): number {
+  return ild(point, ears) / loudnessFullScale(ears);
+}
+
+/** How close two normalised readings must be to count as lined up. */
+export const CUE_TOLERANCE = 0.06;
+
+export function timingAgrees(aim: Point, prey: Point): boolean {
+  return Math.abs(timingReading(prey) - timingReading(aim)) <= CUE_TOLERANCE;
+}
+
+export function loudnessAgrees(aim: Point, prey: Point, ears: EarConfig): boolean {
+  return Math.abs(loudnessReading(prey, ears) - loudnessReading(aim, ears)) <= CUE_TOLERANCE;
+}
+
 export function distance(a: Point, b: Point): number {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
