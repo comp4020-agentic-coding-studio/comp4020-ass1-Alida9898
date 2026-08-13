@@ -22,6 +22,11 @@ const shipped = readFileSync(resolve("dist/index.html"), "utf8");
 document.documentElement.setAttribute("lang", "en-AU");
 document.body.innerHTML = new JSDOM(shipped).window.document.body.innerHTML;
 
+// Checked in a real browser on 2026-08-13 with `ab a11y` (see CLAUDE.md): 0
+// violations, 44 passes. Contrast came back "incomplete" on four SVG <text>
+// labels, which axe cannot measure; those are var(--amber) on the page ground,
+// which is 8.6:1 by hand against a 4.5:1 threshold.
+
 /** Rules axe cannot evaluate without layout, listed so the gap is on the record. */
 const NEEDS_A_BROWSER = ["color-contrast", "target-size"];
 

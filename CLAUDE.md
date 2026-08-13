@@ -178,3 +178,40 @@ a signal available until the deadline is already close. Before treating a
 session as wrapped, run `git status -sb` and `git log --oneline @{upstream}..HEAD`
 and confirm there's nothing sitting uncommitted, not just that the working
 tree is clean.
+
+## Looking at the page: agent-browser
+
+The rendered page is the ground truth, and this project has no browser on the
+PATH. `agent-browser` is not installed globally --- run it through pnpm:
+
+```sh
+ab() { pnpm dlx agent-browser@0.34.0 "$@"; }   # zsh: a function, NOT a variable
+ab open http://localhost:5177/
+ab set viewport 1920 1080     # `viewport` lives under `set`, not at top level
+ab reload && ab screenshot /tmp/desktop.png
+ab set viewport 390 844 && ab reload && ab screenshot /tmp/phone.png
+ab a11y                       # axe-core in real Chrome
+ab errors                     # page errors
+ab close --all
+```
+
+Three things that cost time the first run:
+
+- **zsh does not word-split unquoted parameters.** `AB="pnpm dlx ..."` then
+  `$AB open` fails with `command not found` because the whole string is treated
+  as one command name. Use a shell function.
+- **`viewport` is a subcommand of `set`**, so bare `agent-browser viewport ...`
+  answers `Unknown command`. Same for `device` and `media`.
+- **`set viewport` needs a `reload`** before the screenshot, or you photograph
+  the old layout.
+
+Two checks only a real browser can do, so they do not belong in `pnpm check`:
+
+- **Colour contrast.** `spec/accessibility.test.ts` runs axe in jsdom, which has
+  no layout, so every geometric rule is skipped --- contrast included. `ab a11y`
+  runs the same axe in Chrome and does evaluate it. Note that axe cannot measure
+  SVG `<text>` and reports those as *incomplete*; ours were checked by hand at
+  8.6:1 against the page background.
+- **Both marking viewports.** 1920x1080 and 390x844 each count in full. Check
+  that the hunt is reachable without a scroll at 1080 --- an interactive
+  explainer whose interaction is below the fold has buried its own point.
