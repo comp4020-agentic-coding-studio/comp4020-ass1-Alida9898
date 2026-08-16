@@ -1,83 +1,67 @@
 # Process overview
 
-<!-- TEMPLATE: this file is a shape to fill in, not a form. Replace everything
-     in it with your own overview, and delete this comment — `pnpm
-     check:evidence` will remind you if it's still here. -->
-
-A reading-guide to how the work came together --- a map to your process, not an
-essay about it. Markers read this file and follow its citations; they don't
-trawl the repo for evidence you didn't point at, so if a moment mattered, cite
-it.
-
-This file is the shape; the course site's
-[assessment page](https://comp.anu.edu.au/courses/comp4020-agentic-coding-studio/topics/assessment/#what-you-submit)
-is the requirement, and each brief adds its own word count and moment count.
-
 ## What I built
 
-One paragraph: the thing, and the idea behind it.
+An interactive explainer about a barn owl's ears. Its two ear openings point in
+different directions — the left aimed down, the right up — and that asymmetry is
+the only reason it can place a sound by height and drop on a mouse it cannot see.
+You hunt in the dark with the owl's two instruments; after three hits in a row the
+page levels your ears without asking, because those are your ears — and you have
+never once placed a sound by height by comparing them. The point of view is that
+the interesting thing here is not a fact about owls but a missing sense in the
+reader.
 
 ## The moments that mattered
 
-Three or four for an assignment; fewer is fine for a weekly prototype. Keep the
-list short so each moment has room to do all four jobs:
+**Cutting three mechanisms down to one.** The first version of the idea was owls in
+general — eyes, neck, ears — which is a museum panel and off-brief. The obvious
+move was to build the interesting bits and see what stuck. Instead I wrote the cut
+down before writing any code
+([`5a2bd0a`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Alida9898/commit/5a2bd0a)),
+including six harness traps found by reading the config rather than hitting them —
+`tsconfig.include` silently excluding `src/`, `starter.test.ts` pinning
+`data-testid="intro"` into the home page. What told me the plan held was that the
+file predicted what actually happened.
 
-1. **what happened** --- the problem, or the thing the agent got wrong
-2. **what you did instead of the obvious thing** --- the call you made, and why
-   it beat the obvious one
-3. **how you knew it was right** --- the check you ran, the viewport you looked
-   at, what you read before accepting the diff
-4. **the citation** --- a commit or commit range, a `CLAUDE.md` change, a check
-   that went from red to green, a prompt paired with the commit it produced
+**Throwing away a design an hour after building it.** I built aiming as a nulling
+task: move your crosshair until two readings match
+([`3d40446`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Alida9898/commit/3d40446)).
+It was fun and it taught nothing — you never learn that a loudness difference *is*
+a height, you just wiggle until it agrees. The obvious fix was to add an
+explanation; instead I deleted the mechanic and rebuilt the gauges as calibrated
+readouts aligned to the field's own axes
+([`3d40446...6526d42`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Alida9898/compare/3d40446...6526d42)),
+discarding the helpers I had written for nulling an hour earlier. Writing the
+inverse then turned up something better than the design I set out to build: the
+height coefficient goes to *exactly* zero when the ears are levelled, so the model
+returns null rather than a bad number, and the test asserts zero rather than small.
 
-Jobs 2 and 3 are the ones the repo can't tell a reader on its own, so they're
-where the marks are. The strongest moments are the ones where a correction
-landed in the **harness** rather than in another prompt --- a rule added to
-`CLAUDE.md`, a check wired up, an attempt thrown away: re-prompting until it
-passes is the routine case, and changing what the agent works against is the
-skilled one.
+**Being wrong twice, then moving the claim into the harness.** Asked why a human
+cannot just tilt their head to the same effect, I gave a confident answer and wrote
+it into the page. It was wrong, and this repo's own model contradicted it
+([`d0a6e0e`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Alida9898/commit/d0a6e0e)).
+Pushed again — "怎么可能大头转90°呀？那我如果稍微微微偏头25°，不就和他一样吗？" — the
+second answer was wrong too. Prose had agreed with me both times. So instead of a
+third paragraph I extended the model to represent a rolled head and asserted the
+claim: tilted twenty-five degrees, two places ten target widths apart produce
+identical timing *and* identical loudness; an owl at the same angle hears them apart
+([`f29459e`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Alida9898/commit/f29459e)).
+Being wrong twice about my own subject is the argument for putting claims where
+they can fail.
 
-Cite each moment as a link whose text is the commit hash or range and whose
-target is this repo's commit or compare URL, so a reader clicks straight to the
-evidence:
+**Building the sensor I kept saying I needed.** I ended many messages with
+"unverified — no browser here", which was true and did not have to stay true.
+`agent-browser` runs through `pnpm dlx`, and within minutes it showed two defects
+82 passing tests could not: the hunt sat below the fold at 1920×1080, and the owl
+read as a bat
+([`b26a236`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Alida9898/commit/b26a236)).
+The durable part is the `CLAUDE.md` section, not the screenshots — the three things
+that cost time on the first run are written down so they cost nothing next week.
 
-- one commit: [`a1b2c3d`](https://github.com/YOUR-ORG/YOUR-REPO/commit/a1b2c3d)
-- a range:
-  [`a1b2c3d...e4f5a6b`](https://github.com/YOUR-ORG/YOUR-REPO/compare/a1b2c3d...e4f5a6b)
+## Where the checks are
 
-To pair a prompt with the commit it produced, quote the prompt (curated, not a
-full transcript) next to the citation:
-
-> the prompt, verbatim
-
-Screenshots are welcome where one carries the verification better than a
-sentence does. Commit the file to this repo and link it with a **relative**
-path, which is what makes it render on GitHub: `![alt text](docs/before.png)`.
-Images don't count towards the word count and don't replace the citation.
-
-### A worked moment, for shape
-
-Delete this section along with the rest of the boilerplate --- it's here to show
-the four jobs in one paragraph, not to be imitated in content.
-
-> The date formatter kept coming back with `toLocaleDateString()` and no locale
-> argument, so the same build rendered differently on my machine and in CI. I'd
-> already re-prompted it twice, which fixed the line but not the habit, so the
-> third time I put the rule in `CLAUDE.md` instead
-> ([`3f9ac21`](https://github.com/YOUR-ORG/YOUR-REPO/commit/3f9ac21)) and added
-> a spec test that fails on a bare `toLocaleDateString`. That's what told me it
-> had actually taken: the test went red against the old code and green against
-> the new, and the next two features it wrote passed it without prompting
-> ([`3f9ac21...b7e0d14`](https://github.com/YOUR-ORG/YOUR-REPO/compare/3f9ac21...b7e0d14)).
-
-## Before you ship
-
-`pnpm check:evidence` verifies your citations resolve to real commits, that the
-current reflection entry is in `reflections/`, and that your `CLAUDE.md` is
-there --- before a marker ever opens the file. It checks that your map is
-traceable, not that it is good: the marker judges whether your small,
-deliberately chosen set of moments shows real judgement and reflection. A green
-check is not a substitute for that curation.
-
-Images are deliberately not checked, because whether one renders is visible the
-moment you look. Open this file on GitHub and look at it before you ship.
+Beyond the shipped invariants, the tests worth reading assert the page's argument
+rather than its implementation — chiefly that levelled ears carry *no* height
+information rather than a little. A late accessibility sensor
+([`14c7b87`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Alida9898/commit/14c7b87))
+caught a prohibited `aria-label` screen readers had been dropping silently.
