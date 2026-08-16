@@ -277,6 +277,12 @@ footer {
   gap: 1.75rem;
 }
 
+.cue-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
 .cue-kind {
   margin: 0.15rem 0 0.9rem;
   font-size: 0.85rem;

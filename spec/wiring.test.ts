@@ -56,7 +56,7 @@ describe("the page puts the hunt before the explanation", () => {
   it("opens with something to do", () => {
     const hunt = headings.findIndex((text) => /^Hunt$/.test(text));
     const theory = headings.findIndex((text) => /How the owl does it/.test(text));
-    const payoff = headings.findIndex((text) => /What just happened/.test(text));
+    const payoff = headings.findIndex((text) => /what about you/i.test(text));
 
     expect(hunt, "no Hunt section in the shipped page").toBeGreaterThanOrEqual(0);
     expect(theory, "no explanation section in the shipped page").toBeGreaterThanOrEqual(0);
@@ -68,8 +68,6 @@ describe("the page puts the hunt before the explanation", () => {
   });
 });
 
-// The invariants give every <img> an alt check, and inline SVG slips straight past
-// it — so the diagrams need their own.
 // The page's whole distinction is that an owl moves where its ears AIM without
 // moving where they SIT — move the positions and you have drawn a tilted head,
 // which is the thing being ruled out. That went wrong in the owl diagram and was
@@ -97,6 +95,8 @@ describe("no diagram draws a tilted head", () => {
   });
 });
 
+// The invariants give every <img> an alt check, and inline SVG slips straight past
+// it — so the diagrams need their own.
 describe("the diagrams are legible to a screen reader", () => {
   it("gives each one a real accessible name", () => {
     const diagrams = [...document.querySelectorAll('svg[role="img"]')];
