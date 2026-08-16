@@ -33,6 +33,15 @@ document.body.innerHTML = new JSDOM(shipped).window.document.body.innerHTML;
 
 await import("../nav");
 
+/** Every built stylesheet, concatenated. */
+function builtCss(): string {
+  const assets = resolve("dist/assets");
+  return readdirSync(assets)
+    .filter((name) => name.endsWith(".css"))
+    .map((name) => readFileSync(resolve(assets, name), "utf8"))
+    .join("");
+}
+
 function toggle(): HTMLButtonElement {
   const found = document.querySelector<HTMLButtonElement>("#nav-toggle");
   if (!found) throw new Error("the shipped page has no #nav-toggle");
@@ -98,15 +107,28 @@ describe("the wider layout always has its nav back", () => {
   });
 });
 
+// `hidden` is display:none in the UA sheet at specificity (0,1,0), so any class
+// setting display beats it. This shipped once: the desktop page showed the
+// hamburger AND the full list, while every check that read the .hidden PROPERTY
+// passed, because the property was set correctly and the CSS ignored it. jsdom
+// has no cascade to catch that, so assert the rule exists.
+describe("hiding with the attribute actually hides", () => {
+  it("pairs every display-setting nav class with its own [hidden] rule", () => {
+    const css = builtCss();
+    for (const selector of [".steps[hidden]", ".nav-toggle[hidden]"]) {
+      expect(
+        css.includes(selector),
+        `${selector} is missing, so the hidden attribute does nothing on it — the element sets display and wins`,
+      ).toBe(true);
+    }
+  });
+});
+
 // nav.ts hard-codes the query and styles.css hard-codes the breakpoint. If they
 // drift, the button appears at one width and the panel styling at another.
 describe("the script and the stylesheet agree on where a phone starts", () => {
   it("uses the same breakpoint in both", () => {
-    const assets = resolve("dist/assets");
-    const css = readdirSync(assets)
-      .filter((name) => name.endsWith(".css"))
-      .map((name) => readFileSync(resolve(assets, name), "utf8"))
-      .join("");
+    const css = builtCss();
 
     expect(
       css.includes("width<34rem") || css.includes("width < 34rem"),

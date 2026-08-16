@@ -31,7 +31,7 @@ footer {
 }
 
 header {
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.9rem;
 }
 
 nav {
@@ -142,9 +142,13 @@ a {
   top: 5px;
 }
 
-/* `.steps` sets display:flex, which beats the UA sheet's [hidden] rule at equal
-   specificity — so without this the hidden attribute does nothing at all. */
-.steps[hidden] {
+/* Both of these set `display`, which beats the UA sheet's [hidden] rule at equal
+   specificity — so without these two the hidden attribute does nothing at all.
+   Missing the one on .nav-toggle shipped a desktop page showing the hamburger
+   AND the full list; the property was set, so every check that read .hidden
+   passed. A screenshot caught it. */
+.steps[hidden],
+.nav-toggle[hidden] {
   display: none;
 }
 
@@ -172,13 +176,13 @@ a {
    barn owl looks like from below, which is the only angle a mouse ever gets. */
 
 .hero {
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.15rem;
 }
 
 .hero-owl {
   display: block;
   width: 100%;
-  max-width: 12rem;
+  max-width: 8rem;
   margin: 0 auto;
   animation: swoop 1200ms cubic-bezier(0.16, 0.8, 0.28, 1) both;
 }
@@ -229,7 +233,7 @@ a {
 }
 
 h1 {
-  margin: 0 0 1.25rem;
+  margin: 0 0 0.85rem;
   font-size: clamp(1.75rem, 5vw, 2.6rem);
   line-height: 1.15;
   letter-spacing: -0.02em;
