@@ -9,6 +9,9 @@ import {
   itd,
   itdMicroseconds,
   EAR_JITTER_DECIBELS,
+  HIT_RADIUS as TARGET,
+  HUMAN_HEIGHT_BLUR,
+  roughHeight,
   earsMirrored,
   distance,
   earsRolled,
@@ -336,6 +339,44 @@ describe("tilting your head is not the same as an owl's offset", () => {
       Math.abs(itdRolled(high, TILT) - itdRolled(low, TILT)),
       "a tilted head drags the timing axis round with it, which is the half of the story I got wrong twice",
     ).toBeGreaterThan(0);
+  });
+});
+
+// Levelling the ears does not leave a human helpless, and saying so would be an
+// overstatement the page does not need. The two-ear comparison really does give
+// nothing — that is asserted above and stays exact. What is left is a separate
+// mechanism: one outer ear's spectral colouring, which places a height coarsely.
+// A region rather than a reading, which is the honest version of the contrast.
+describe("one human ear places height to a band, not a point", () => {
+  const rolls = Array.from({ length: 200 }, (_, i) => (i + 0.5) / 200);
+
+  it("always contains the truth", () => {
+    for (const roll of rolls) {
+      const truth = at(0.2, roll * 1.6 - 0.8);
+      const band = roughHeight(truth, () => roll);
+      expect(
+        truth.y >= band.low && truth.y <= band.high,
+        `the band ${band.low.toFixed(2)}..${band.high.toFixed(2)} missed a mouse at ${truth.y.toFixed(2)}; a band that can exclude the answer is worse than no band`,
+      ).toBe(true);
+    }
+  });
+
+  it("does not centre itself on the answer, or reading it would be free", () => {
+    const truth = at(0, 0);
+    const offsets = rolls.map((roll) => Math.abs(roughHeight(truth, () => roll).estimate));
+    expect(
+      Math.max(...offsets),
+      "the estimate never strays from the truth, which would make the band decoration",
+    ).toBeGreaterThan(TARGET);
+  });
+
+  it("is far wider than the target, so it cannot stand in for a reading", () => {
+    const band = roughHeight(at(0, 0), () => 0.5);
+    expect(
+      (band.high - band.low) / (2 * TARGET),
+      "a band this tight would be as good as knowing, and the page would be claiming too little for the owl",
+    ).toBeGreaterThan(3);
+    expect(HUMAN_HEIGHT_BLUR).toBeLessThan(1);
   });
 });
 

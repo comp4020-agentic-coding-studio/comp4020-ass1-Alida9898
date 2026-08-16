@@ -29,6 +29,8 @@ import {
   heightUncertainty,
   HIT_RADIUS,
   randomPrey,
+  type RoughHeight,
+  roughHeight,
   stereoCue,
 } from "./acoustics";
 import { canListen, play } from "./listen";
@@ -54,6 +56,7 @@ const reveal = need("reveal");
 const curtain = need<HTMLDialogElement>("curtain");
 const curtainDismiss = need("curtain-dismiss");
 const gaugeV = need("gauge-v");
+const bandV = need("v-band");
 const soundV = need("v-sound");
 const aimV = need("v-aim");
 const soundH = need("h-sound");
@@ -115,7 +118,7 @@ const MAX_MARKS = 60;
 
 const LOUDNESS_KIND: Record<EarMode, string> = {
   uneven: "from which ear hears it louder — the gauge up the side",
-  level: "both ears now point the same way, so this gauge has nothing to show",
+  level: "both ears now point the same way — what is left is one ear's guess",
 };
 
 interface Tally {
@@ -135,6 +138,7 @@ let revealing = false;
 let dragging = false;
 let hearing = false;
 let heardThisRound = false;
+let rough: RoughHeight = { estimate: 0, low: -1, high: 1 };
 let chosenByVisitor = false;
 let levelledForYou = false;
 let streak = 0;
@@ -176,7 +180,8 @@ function bearingText(heard: Inference): string {
 
   if (heard.high === null) {
     const lateral = across === null ? "lined up left to right" : `${across} of your aim`;
-    return `Sound ${lateral}. Height unknown with level ears.`;
+    const band = aim.y > rough.high ? "below" : aim.y < rough.low ? "above" : "inside";
+    return `Sound ${lateral}. Height only to a band, and your aim is ${band} it.`;
   }
 
   const high = heard.high - aim.y > step ? "above" : aim.y - heard.high > step ? "below" : null;
@@ -204,10 +209,17 @@ function render(): void {
 
   const height = heard.high;
   soundH.hidden = !hearing;
+
+  // With an owl's ears the height is a reading. With yours it is a region: the
+  // comparison between your ears gives nothing, and your outer ear gives a band.
   soundV.hidden = !hearing || height === null;
+  bandV.hidden = !hearing || height !== null;
   if (hearing) {
     soundH.style.left = leftPercent(heard.across);
-    if (height !== null) {
+    if (height === null) {
+      bandV.style.top = topPercent(rough.high);
+      bandV.style.height = `${((rough.high - rough.low) / 2) * 100}%`;
+    } else {
       soundV.style.top = topPercent(height);
     }
   }
@@ -254,8 +266,9 @@ function render(): void {
   if (height === null) {
     // The measurement is real; the inference is not. That distinction is the
     // whole page, so the readout has to make it rather than going blank.
-    readLoudness.textContent = `${reading} — and that is not a height at all.`;
-    figureLoudness.textContent = "Level ears: the difference no longer varies with height.";
+    readLoudness.textContent = `${reading} — which is not a height at all.`;
+    figureLoudness.textContent =
+      "Your ears say nothing about height. The shape of one outer ear narrows it to the band, and no further.";
     readLoudness.dataset.blind = "true";
   } else {
     readLoudness.textContent = `${reading}.`;
@@ -347,6 +360,7 @@ function setEars(next: EarMode): void {
 
 function nextRound(): void {
   prey = randomPrey(Math.random);
+  rough = roughHeight(prey, Math.random);
   revealing = false;
   hearing = false;
   heardThisRound = false;

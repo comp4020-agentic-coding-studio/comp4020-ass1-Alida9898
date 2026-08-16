@@ -269,6 +269,41 @@ export function heightUncertainty(ears: EarConfig, jitterDecibels: number): numb
 /** What a barn owl can actually tell apart in a loudness comparison, roughly. */
 export const EAR_JITTER_DECIBELS = 1;
 
+/**
+ * How coarsely a human places height from one ear's spectral colouring, as a
+ * fraction of the field's half-height.
+ *
+ * This is the OTHER mechanism, and it matters that it is separate. Comparing your
+ * two ears says exactly nothing about height — that is what loudnessPerHeight()
+ * going to zero means, and it stays true. But the folds of your outer ear filter a
+ * sound by the angle it arrives from, so a single ear carries a rough elevation
+ * fingerprint. Rough is the word: azimuth acuity is a couple of degrees, elevation
+ * is more like fifteen.
+ */
+export const HUMAN_HEIGHT_BLUR = 0.38;
+
+export interface RoughHeight {
+  /** Where the spectral cue says it is — the truth, knocked off by some bias. */
+  readonly estimate: number;
+  readonly low: number;
+  readonly high: number;
+}
+
+/**
+ * What one human ear can say about height. The band always contains the truth; the
+ * estimate at its centre does not, which is the whole difference between a reading
+ * and a region.
+ */
+export function roughHeight(source: Point, random: () => number): RoughHeight {
+  const bias = (random() * 2 - 1) * HUMAN_HEIGHT_BLUR;
+  const estimate = clampToField(source.y + bias);
+  return {
+    estimate,
+    low: Math.max(-1, estimate - HUMAN_HEIGHT_BLUR),
+    high: Math.min(1, estimate + HUMAN_HEIGHT_BLUR),
+  };
+}
+
 /** What to feed each channel to play a sound as these ears would receive it. */
 export interface StereoCue {
   /** Seconds to hold each channel back. The nearer ear is always zero. */

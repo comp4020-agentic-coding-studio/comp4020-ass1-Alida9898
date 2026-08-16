@@ -385,6 +385,18 @@ footer {
     left 220ms ease-out;
 }
 
+/* A region rather than a point: what one human ear can say about height. */
+
+.gauge-band {
+  position: absolute;
+  right: 0;
+  left: 0;
+  background: rgb(240 102 78 / 22%);
+  border-top: 1px solid rgb(240 102 78 / 45%);
+  border-bottom: 1px solid rgb(240 102 78 / 45%);
+  border-radius: 2px;
+}
+
 .gauge-aim {
   position: absolute;
   width: 0.5rem;
@@ -697,9 +709,10 @@ footer {
   gap: 1.25rem;
   align-items: center;
   justify-content: center;
-  margin: 0.9rem 0 0;
-  padding: 0;
+  margin: 1.6rem auto 0;
+  padding: 0.75rem 0 0;
   border: 0;
+  border-top: 1px solid var(--line);
 }
 
 .ears legend {
