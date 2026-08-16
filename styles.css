@@ -78,6 +78,21 @@ a {
   fill: #b9a894;
 }
 
+/* The reading has 1.8 seconds and then it is gone, so it has to announce itself
+   rather than merely appear. */
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @keyframes swoop {
   from {
     opacity: 0;
@@ -141,6 +156,7 @@ footer {
 
 .field {
   position: relative;
+  transition: border-color 160ms ease-out, box-shadow 160ms ease-out;
   grid-row: 1;
   grid-column: 3;
   aspect-ratio: 3 / 2;
@@ -156,6 +172,14 @@ footer {
 .field:focus-visible {
   outline: 2px solid var(--amber);
   outline-offset: 3px;
+}
+
+/* While the sound is in the air the field is lit, so the window is visible from
+   wherever the eye happens to be. */
+
+.rig[data-hearing="true"] .field {
+  border-color: var(--warm);
+  box-shadow: 0 0 0 1px var(--warm);
 }
 
 .field-grid {
@@ -350,6 +374,7 @@ footer {
 
 .gauge-sound {
   position: absolute;
+  animation: arrive 320ms ease-out;
   width: 1.1rem;
   height: 1.1rem;
   margin: -0.55rem 0 0 -0.55rem;
@@ -675,6 +700,10 @@ footer {
   color: var(--muted);
 }
 
+.ears input {
+  accent-color: var(--amber);
+}
+
 .ears label {
   display: flex;
   gap: 0.6rem;
@@ -765,6 +794,7 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .gauge-sound {
     transition: none;
+    animation: none;
   }
 
   .hero-owl {

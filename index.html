@@ -56,7 +56,7 @@
       <section class="hunt" aria-labelledby="hunt-heading">
         <h2 id="hunt-heading">Hunt</h2>
 
-        <div class="rig">
+        <div class="rig" id="rig">
           <p class="rig-axis rig-axis-v" aria-hidden="true">
             <span>high</span>
             <span>low</span>
@@ -101,6 +101,12 @@
           </p>
         </div>
 
+        <div class="controls">
+          <button type="button" class="listen" id="listen">Listen</button>
+          <button type="button" class="strike" id="strike">Strike</button>
+          <p class="status" id="status" role="status">Aim, then strike.</p>
+        </div>
+
         <p class="field-hint">
           While the sound is in the air, a hollow ring shows where your ears place
           it; the solid dot is your own aim, and stays. Every strike leaves a mark on
@@ -127,12 +133,6 @@
         </div>
 
         <p class="visually-hidden" id="bearing" aria-live="polite"></p>
-
-        <div class="controls">
-          <button type="button" class="listen" id="listen">Listen</button>
-          <button type="button" class="strike" id="strike">Strike</button>
-          <p class="status" id="status" role="status">Aim, then strike.</p>
-        </div>
 
         <p class="listen-note" id="listen-note">
           The mouse rustles <strong>once</strong>. Press Listen, read both gauges

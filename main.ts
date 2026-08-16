@@ -49,6 +49,7 @@ const field = need("field");
 const fieldAim = need("field-aim");
 const fieldPrey = need("field-prey");
 const fieldMarks = need("field-marks");
+const rig = need("rig");
 const reveal = need("reveal");
 const curtain = need<HTMLDialogElement>("curtain");
 const curtainDismiss = need("curtain-dismiss");
@@ -93,7 +94,7 @@ const REVEAL_MS = 1400;
  * from what you remember. It also settles the tilt objection by construction:
  * there is nothing left to turn your head towards.
  */
-const RUSTLE_MS = 1500;
+const RUSTLE_MS = 1800;
 
 /**
  * Hits in a row with an owl's ears before the page levels them for you.
@@ -198,6 +199,8 @@ function render(): void {
   // Your own aim is always on the gauges; the sound is only there while it lasts.
   aimH.style.left = leftPercent(aim.x);
   aimV.style.top = topPercent(aim.y);
+
+  rig.dataset.hearing = String(hearing);
 
   const height = heard.high;
   soundH.hidden = !hearing;
