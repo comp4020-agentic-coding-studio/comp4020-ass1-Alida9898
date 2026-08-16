@@ -96,8 +96,12 @@ const REVEAL_MS = 1400;
  * which quietly contradicted the whole thing. One listen per mouse, then you aim
  * from what you remember. It also settles the tilt objection by construction:
  * there is nothing left to turn your head towards.
+ *
+ * Tuned by playing it. 1500 felt rushed while the buttons were still a screenful
+ * below the gauges; 1800 once they moved up was long enough to feel generous,
+ * which is the wrong feeling for a page about a sound that does not wait.
  */
-const RUSTLE_MS = 1800;
+const RUSTLE_MS = 1400;
 
 /**
  * Hits in a row with an owl's ears before the page levels them for you.
