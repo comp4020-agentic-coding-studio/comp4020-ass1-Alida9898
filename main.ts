@@ -85,6 +85,17 @@ const KEY_STEP = 0.04;
 const REVEAL_MS = 1400;
 
 /**
+ * How long the readings stay up after the mouse rustles, in milliseconds.
+ *
+ * The page argues that prey under snow makes one short noise and does not repeat
+ * it — and until now the gauges sat there indefinitely while you took your time,
+ * which quietly contradicted the whole thing. One listen per mouse, then you aim
+ * from what you remember. It also settles the tilt objection by construction:
+ * there is nothing left to turn your head towards.
+ */
+const RUSTLE_MS = 1500;
+
+/**
  * Hits in a row with an owl's ears before the page levels them for you.
  *
  * A run rather than a running total, because the turn should land the moment you
@@ -121,6 +132,8 @@ let prey: Point = randomPrey(Math.random);
 let aim: Point = { x: 0, y: 0 };
 let revealing = false;
 let dragging = false;
+let hearing = false;
+let heardThisRound = false;
 let chosenByVisitor = false;
 let levelledForYou = false;
 let streak = 0;
@@ -182,18 +195,33 @@ function render(): void {
   fieldPrey.style.left = leftPercent(prey.x);
   fieldPrey.style.top = topPercent(prey.y);
 
-  // How far across: always available, in either pair of ears.
-  soundH.style.left = leftPercent(heard.across);
+  // Your own aim is always on the gauges; the sound is only there while it lasts.
   aimH.style.left = leftPercent(aim.x);
-
-  // How high: available only when the ears are aimed apart.
-  const height = heard.high;
-  soundV.hidden = height === null;
-  if (height !== null) {
-    soundV.style.top = topPercent(height);
-  }
   aimV.style.top = topPercent(aim.y);
-  gaugeV.dataset.blind = String(height === null);
+
+  const height = heard.high;
+  soundH.hidden = !hearing;
+  soundV.hidden = !hearing || height === null;
+  if (hearing) {
+    soundH.style.left = leftPercent(heard.across);
+    if (height !== null) {
+      soundV.style.top = topPercent(height);
+    }
+  }
+  gaugeV.dataset.blind = String(hearing && height === null);
+
+  if (!hearing) {
+    readTiming.textContent = heardThisRound
+      ? "Gone. Strike from what you heard."
+      : "Nothing yet. Press Listen.";
+    readLoudness.textContent = readTiming.textContent;
+    figureTiming.textContent = "";
+    figureLoudness.textContent = "";
+    delete readLoudness.dataset.blind;
+    bearing.textContent = heardThisRound ? "The sound has gone." : "";
+    renderScore();
+    return;
+  }
 
   const microseconds = itdMicroseconds(prey);
   const sooner = Math.abs(microseconds);
@@ -223,7 +251,10 @@ function render(): void {
   }
 
   bearing.textContent = bearingText(heard);
+  renderScore();
+}
 
+function renderScore(): void {
   for (const key of ["uneven", "level"] as const) {
     const { hits, strikes } = tally[key];
     const cells = scoreCells[key];
@@ -231,6 +262,21 @@ function render(): void {
     cells.strikes.textContent = String(strikes);
     cells.rate.textContent = strikes === 0 ? "—" : `${Math.round((hits / strikes) * 100)}%`;
   }
+}
+
+/** One rustle: the readings appear, the sound plays, and then it is over. */
+function rustle(): void {
+  if (heardThisRound || revealing) return;
+  heardThisRound = true;
+  hearing = true;
+  listenButton.disabled = true;
+  play(stereoCue(prey, EAR_MODES[mode]));
+  render();
+
+  window.setTimeout(() => {
+    hearing = false;
+    render();
+  }, RUSTLE_MS);
 }
 
 /**
@@ -289,6 +335,9 @@ function setEars(next: EarMode): void {
 function nextRound(): void {
   prey = randomPrey(Math.random);
   revealing = false;
+  hearing = false;
+  heardThisRound = false;
+  listenButton.disabled = false;
   render();
 }
 
@@ -450,19 +499,13 @@ field.addEventListener("pointercancel", onPointerUp);
 field.addEventListener("keydown", onKeyDown);
 strikeButton.addEventListener("click", strike);
 
-// Audio is an addition, never a dependency: if the browser cannot play it, the
-// button says so plainly and the rest of the page is untouched.
-if (canListen()) {
-  listenButton.addEventListener("click", () => {
-    if (!play(stereoCue(prey, EAR_MODES[mode]))) {
-      listenButton.disabled = true;
-      listenNote.textContent = "This browser would not start audio. The gauges are the whole story anyway.";
-    }
-  });
-} else {
-  listenButton.disabled = true;
+listenButton.addEventListener("click", rustle);
+
+// Audio is still an addition and never a dependency: without it, Listen does
+// everything except make a noise — the readings appear and fade exactly the same.
+if (!canListen()) {
   listenNote.textContent =
-    "This browser has no Web Audio, so Listen is off. Everything the page argues is in the gauges.";
+    "This browser has no Web Audio, so Listen shows the reading without playing it. The gauges carry the whole argument either way.";
 }
 curtainDismiss.addEventListener("click", dropCurtain);
 curtain.addEventListener("close", () => field.focus());

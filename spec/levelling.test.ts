@@ -48,6 +48,7 @@ function press(key: string, times: number): void {
  * With an owl's ears the gauges point exactly at the mouse, so this should hit.
  */
 function aimWhereTheEarsSay(): void {
+  listen();
   const across = Math.round(
     (positionOf("h-sound", "left") - positionOf("field-aim", "left")) / KEY_STEP,
   );
@@ -58,7 +59,13 @@ function aimWhereTheEarsSay(): void {
 
 /** Aim at the far edge from the mouse, so the strike is certain to miss. */
 function aimNowhereNear(): void {
+  listen();
   press(positionOf("v-sound", "top") > 0 ? "ArrowDown" : "ArrowUp", 60);
+}
+
+/** The mouse rustles once; the readings are only up until the timers advance. */
+function listen(): void {
+  element("listen").click();
 }
 
 function strikeAndSettle(): void {

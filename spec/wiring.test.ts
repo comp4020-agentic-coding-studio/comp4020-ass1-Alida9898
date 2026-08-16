@@ -144,16 +144,16 @@ describe("the page wires itself up", () => {
 // actually matters: a marking room with the sound off, or a browser that refuses
 // to start an AudioContext. The page has to lose nothing but the sound.
 describe("audio is an addition and never a dependency", () => {
-  it("turns Listen off and says why when the browser cannot play", () => {
+  it("keeps Listen working when the browser cannot play a sound", () => {
     const listen = document.querySelector<HTMLButtonElement>("#listen");
     expect(listen, "no Listen control in the shipped page").toBeTruthy();
     expect(
       listen?.disabled,
-      "the browser has no AudioContext, so Listen must be inert rather than silently doing nothing",
-    ).toBe(true);
+      "Listen is the round's control now, not an optional extra — without audio it must still reveal the reading",
+    ).toBe(false);
     expect(
       document.querySelector("#listen-note")?.textContent ?? "",
-      "a dead button needs to explain itself, and to say the page still works without it",
+      "the note has to say the page still argues its case with the sound off",
     ).toMatch(/gauges/i);
   });
 
@@ -203,6 +203,50 @@ describe("the offset exhibit answers why so lopsided", () => {
     const slider = document.querySelector<HTMLInputElement>("#offset");
     expect(slider?.labels?.[0]?.textContent?.trim().length ?? 0).toBeGreaterThan(5);
     expect(slider?.getAttribute("aria-describedby")).toBe("offset-read");
+  });
+});
+
+// The page's case rests on prey that makes one short noise and does not repeat it.
+// An always-on reading would quietly contradict that, so the sound has to be
+// something you spend rather than something you consult.
+describe("the mouse rustles once", () => {
+  function ring(id: string): HTMLElement | null {
+    return document.querySelector<HTMLElement>(`#${id}`);
+  }
+
+  it("shows nothing until you listen", () => {
+    chooseEars("uneven");
+    settle();
+    expect(
+      ring("h-sound")?.hidden,
+      "the reading was on the gauge before the mouse had made a sound",
+    ).toBe(true);
+    expect(text("read-timing")).toMatch(/Listen/i);
+  });
+
+  it("puts the reading up when you do", () => {
+    click("listen");
+    expect(ring("h-sound")?.hidden, "listening produced no reading").toBe(false);
+    expect(text("read-timing")).toMatch(/µs|at once/);
+  });
+
+  it("takes it away again, and will not repeat for the same mouse", () => {
+    settle();
+    expect(ring("h-sound")?.hidden, "the sound stayed up; there is no urgency then").toBe(true);
+    expect(
+      document.querySelector<HTMLButtonElement>("#listen")?.disabled,
+      "a second listen at the same mouse is exactly what the page says prey does not allow",
+    ).toBe(true);
+    expect(text("read-timing")).toMatch(/Strike from what you heard/i);
+  });
+
+  it("gives you a fresh one next round", () => {
+    click("strike");
+    settle();
+    expect(
+      document.querySelector<HTMLButtonElement>("#listen")?.disabled,
+      "a new mouse has to be listenable, or the hunt ends after one round",
+    ).toBe(false);
   });
 });
 
