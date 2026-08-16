@@ -104,14 +104,24 @@
         <div class="controls">
           <button type="button" class="listen" id="listen">Listen</button>
           <button type="button" class="strike" id="strike">Strike</button>
-          <p class="status" id="status" role="status">Aim, then strike.</p>
+          <p class="status" id="status" role="status">Press Listen. The mouse rustles once.</p>
         </div>
 
+        <fieldset class="ears">
+          <legend>Ears</legend>
+          <label>
+            <input type="radio" name="ears" value="uneven" id="ears-uneven" checked />
+            <span>An owl's</span>
+          </label>
+          <label>
+            <input type="radio" name="ears" value="level" id="ears-level" />
+            <span>Yours</span>
+          </label>
+        </fieldset>
+
         <p class="field-hint">
-          While the sound is in the air, a hollow ring shows where your ears place
-          it; the solid dot is your own aim, and stays. Every strike leaves a mark on
-          the field — green where you connected, red where you did not. Drag inside
-          the field, or focus it and use the arrow keys, then press Enter to strike.
+          Drag in the field to aim, or use the arrow keys. The hollow ring is where
+          your ears place the mouse; the solid dot is your aim.
         </p>
 
         <div class="cues">
@@ -135,27 +145,13 @@
         <p class="visually-hidden" id="bearing" aria-live="polite"></p>
 
         <p class="listen-note" id="listen-note">
-          The mouse rustles <strong>once</strong>. Press Listen, read both gauges
-          while they are lit, and strike from what you have. It will not do it again
-          — real prey does not. Headphones, if you have them: the sound is played
-          into two channels the way these ears receive it.
+          The mouse rustles <strong>once</strong> — real prey does not repeat itself.
+          Headphones if you have them.
         </p>
 
         <p class="reveal" id="reveal" role="status" hidden>
           You are now hunting with your own ears.
         </p>
-
-        <fieldset class="ears">
-          <legend>Ears</legend>
-          <label>
-            <input type="radio" name="ears" value="uneven" id="ears-uneven" checked />
-            <span>An owl's <small>offset vertically: left aimed down, right aimed up</small></span>
-          </label>
-          <label>
-            <input type="radio" name="ears" value="level" id="ears-level" />
-            <span>Yours <small>level with each other, like every human's</small></span>
-          </label>
-        </fieldset>
 
         <table class="score">
           <caption>Your hit rate, kept separately for each pair of ears</caption>

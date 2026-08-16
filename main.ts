@@ -214,16 +214,26 @@ function render(): void {
   gaugeV.dataset.blind = String(hearing && height === null);
 
   if (!hearing) {
-    readTiming.textContent = heardThisRound
-      ? "Gone. Strike from what you heard."
-      : "Nothing yet. Press Listen.";
-    readLoudness.textContent = readTiming.textContent;
+    // One prompt, in the status line where instructions live — not the same
+    // sentence printed twice across two columns.
+    const gone = heardThisRound ? "Gone." : "—";
+    readTiming.textContent = gone;
+    readLoudness.textContent = gone;
     figureTiming.textContent = "";
     figureLoudness.textContent = "";
     delete readLoudness.dataset.blind;
+    if (!revealing) {
+      status.textContent = heardThisRound
+        ? "Aim from what you heard, then strike."
+        : "Press Listen. The mouse rustles once.";
+    }
     bearing.textContent = heardThisRound ? "The sound has gone." : "";
     renderScore();
     return;
+  }
+
+  if (!revealing) {
+    status.textContent = "Listening.";
   }
 
   const microseconds = itdMicroseconds(prey);
@@ -377,7 +387,6 @@ function strike(): void {
 
   window.setTimeout(() => {
     strikeButton.disabled = false;
-    status.textContent = "Aim, then strike.";
 
     const readyToLevel =
       mode === "uneven" &&

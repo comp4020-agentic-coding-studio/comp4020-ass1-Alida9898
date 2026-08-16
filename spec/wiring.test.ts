@@ -120,12 +120,11 @@ describe("the diagrams are legible to a screen reader", () => {
 });
 
 describe("the page wires itself up", () => {
-  it("puts a reading in both cue meters before the first strike", () => {
+  it("tells the visitor what to do before anything has happened", () => {
     expect(
-      text("read-timing"),
-      "the left-right readout is still the placeholder; render() did not run",
-    ).not.toBe("—");
-    expect(text("read-loudness")).not.toBe("—");
+      text("status"),
+      "render() did not run, or the opening instruction does not point at Listen",
+    ).toMatch(/Listen/i);
   });
 
   it("places the aim inside the field rather than leaving it unpositioned", () => {
@@ -221,7 +220,8 @@ describe("the mouse rustles once", () => {
       ring("h-sound")?.hidden,
       "the reading was on the gauge before the mouse had made a sound",
     ).toBe(true);
-    expect(text("read-timing")).toMatch(/Listen/i);
+    expect(text("read-timing"), "an empty gauge should read as empty").toBe("—");
+    expect(text("status"), "the prompt belongs in the status line, once").toMatch(/Listen/i);
   });
 
   it("puts the reading up when you do", () => {
@@ -237,7 +237,8 @@ describe("the mouse rustles once", () => {
       document.querySelector<HTMLButtonElement>("#listen")?.disabled,
       "a second listen at the same mouse is exactly what the page says prey does not allow",
     ).toBe(true);
-    expect(text("read-timing")).toMatch(/Strike from what you heard/i);
+    expect(text("read-timing")).toBe("Gone.");
+    expect(text("status")).toMatch(/from what you heard/i);
   });
 
   it("gives you a fresh one next round", () => {

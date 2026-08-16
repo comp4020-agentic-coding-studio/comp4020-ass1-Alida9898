@@ -590,9 +590,11 @@ footer {
 
 .controls {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
   align-items: center;
-  margin: 2rem 0 0;
+  justify-content: center;
+  margin: 1.25rem 0 0;
 }
 
 .strike {
@@ -633,7 +635,9 @@ footer {
 }
 
 .status {
+  flex-basis: 100%;
   margin: 0;
+  text-align: center;
   font-size: 0.9rem;
   color: var(--muted);
 }
@@ -685,16 +689,24 @@ footer {
   color: var(--amber);
 }
 
+/* The toggle is the page's argument in one control, so it sits with the buttons
+   rather than under a screenful of prose. */
+
 .ears {
-  margin: 2rem 0 0;
-  padding: 1rem 1.1rem;
-  border: 1px solid var(--line);
-  border-radius: 0.5rem;
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  border: 0;
 }
 
 .ears legend {
-  padding: 0 0.4rem;
-  font-size: 0.75rem;
+  float: left;
+  padding: 0 0.6rem 0 0;
+  font-size: 0.7rem;
+  line-height: 1.9;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
@@ -706,9 +718,9 @@ footer {
 
 .ears label {
   display: flex;
-  gap: 0.6rem;
-  align-items: baseline;
-  padding: 0.35rem 0;
+  gap: 0.4rem;
+  align-items: center;
+  font-size: 0.9rem;
   cursor: pointer;
 }
 
