@@ -43,8 +43,8 @@ function renderOffset(): void {
   // sides of the skull, because moving them apart vertically would draw a tilted
   // head — which is the one thing this whole section exists to distinguish an owl
   // from. Jiayi caught that being drawn wrong; a test now forbids it.
-  earLeft.setAttribute("transform", `rotate(${-degrees} 61.5 48)`);
-  earRight.setAttribute("transform", `rotate(${-degrees} 137 48)`);
+  earLeft.setAttribute("transform", `rotate(${-degrees} 67 55)`);
+  earRight.setAttribute("transform", `rotate(${-degrees} 133 55)`);
 
   const spread = heightUncertainty(earsWithOffset(degrees), EAR_JITTER_DECIBELS);
 

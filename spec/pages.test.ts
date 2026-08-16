@@ -168,3 +168,36 @@ describe("the diagrams are legible to a screen reader", () => {
     ).toBeGreaterThanOrEqual(3);
   });
 });
+
+// Amber on the page's dark ground is 8.6:1; amber on the skull plates' cream is
+// 1.77:1, which is not a label, it is a rumour. Jiayi caught it by eye — axe
+// cannot, because axe does not measure SVG <text> at all. So the rule is
+// positional and checkable: a label may not sit over a plate.
+describe("diagram labels stay off the skull plates", () => {
+  it("keeps every label on the dark ground, where it has contrast", () => {
+    let checked = 0;
+
+    for (const { name, doc } of pages) {
+      for (const diagram of doc.querySelectorAll("svg")) {
+        const plate = diagram.querySelector("image.diagram-skull");
+        if (!plate) continue;
+
+        const num = (el: Element, attr: string) => Number(el.getAttribute(attr) ?? "0");
+        const [px, py, pw, ph] = ["x", "y", "width", "height"].map((a) => num(plate, a));
+
+        for (const label of diagram.querySelectorAll("text.diagram-label")) {
+          checked += 1;
+          const lx = num(label, "x");
+          const ly = num(label, "y");
+          const over = lx >= px && lx <= px + pw && ly >= py && ly <= py + ph;
+          expect(
+            over,
+            `"${label.textContent?.trim()}" in ${name} sits at (${lx}, ${ly}), inside the plate at (${px}, ${py}) ${pw}x${ph}. Amber on cream is 1.77:1.`,
+          ).toBe(false);
+        }
+      }
+    }
+
+    expect(checked, "no diagram labels were found to check").toBeGreaterThan(0);
+  });
+});
