@@ -3,10 +3,17 @@
 ## What I built
 
 **The Owl's Uneven Ears** — an interactive explainer about why a barn owl's two
-ear openings point in different directions. You hunt a mouse you cannot see using
-two gauges. After three hits in a row the page levels your ears without asking —
-*Difficulty: human.* — and the gauge for height goes blank, because a level pair
-has no height to read.
+ear openings point in different directions, in three pages.
+
+**Hunt** is the landing page: a mouse you cannot see, found by reading two
+gauges — one for how far across, one for how high — with real stereo audio, a
+scoreboard kept separately per pair of ears, and a field that keeps every strike
+as a mark. You can switch between an owl's ears and your own at any time, and
+after three hits in a row the page switches them *for* you without asking
+(*Difficulty: human.*), at which point the height gauge becomes a wide band
+instead of a point. **How it works** carries the mechanism and the two skull
+diagrams, owl against human. **Why so lopsided** answers two objections, with a
+draggable exhibit for what one decibel of error costs at a given ear offset.
 
 ## The moments that mattered
 
@@ -54,6 +61,30 @@ darkening them, which also made the two diagrams agree, then turned my own eye
 into a rule: a label may not sit inside a plate. Verified by moving one back.
 
 [`b29d189`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Alida9898/commit/b29d189)
+
+### The mouse should only rustle once
+
+My idea, and it settled something that had been quietly wrong: the page argues
+that prey under snow makes one short noise and does not repeat it, while the
+gauges sat there indefinitely so you could take all the time you liked. The
+interaction was contradicting the text. One listen per mouse, then you aim from
+memory — which also answers the tilt objection by construction, since there is
+nothing left to turn your head towards. Four tests in `spec/wiring.test.ts` hold
+it: nothing before you listen, a reading when you do, gone after, and no repeat
+for the same mouse.
+
+[`2ec0f55`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Alida9898/commit/2ec0f55)
+
+### I asked for the human comparison, then cut it back
+
+Comparing an owl's ears to ours was my suggestion and it became the page's angle.
+Later I decided that was wrong: the subject is the owl's ears themselves, and the
+comparison is a way of seeing them, not the point. So it went back to a small
+section while the hunt kept both modes — and, separately, level ears now report a
+*band* rather than nothing, because a human hearing no height at all is not what
+happens.
+
+[`8d0b739`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Alida9898/commit/8d0b739) · [`4efe23f`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Alida9898/commit/4efe23f)
 
 ## Where to look
 
