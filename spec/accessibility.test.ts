@@ -55,8 +55,10 @@ describe("the shipped page is reachable without a mouse or a screen", () => {
 
   it("names every control a keyboard user can land on", () => {
     const focusable = [
+      // a[href], not [href]: an SVG <image href="..."> matches the broad form and
+      // is not focusable, which made this fail on a decorative illustration.
       ...document.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       ),
     ];
     expect(focusable.length, "nothing is focusable, so the page cannot be used at all").toBeGreaterThan(3);

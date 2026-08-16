@@ -495,11 +495,28 @@ footer {
   color: var(--muted);
 }
 
+/* A black-line-on-white scan on a dark page. invert() flips it to white lines on
+   black, and screen then drops the black entirely, so only the drawing survives. */
+
+.diagram-skull {
+  filter: invert(1);
+  mix-blend-mode: screen;
+  opacity: 0.95;
+}
+
+/* Lighter inside the exhibit than in the static diagrams: here the skull is the
+   subject and the cones are annotation on top of it. */
+
+.exhibit-svg .diagram-cone {
+  fill: rgb(224 162 68 / 26%);
+  stroke: rgb(224 162 68 / 55%);
+}
+
 .exhibit-svg {
   display: block;
   width: 100%;
-  max-width: 13rem;
-  margin: 0 auto 0.8rem;
+  max-width: 18rem;
+  margin: 0 auto 0.9rem;
 }
 
 .exhibit-slider {

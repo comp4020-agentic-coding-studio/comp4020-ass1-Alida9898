@@ -69,8 +69,8 @@ const listenNote = need("listen-note");
 const offsetSlider = need<HTMLInputElement>("offset");
 const offsetBand = need("offset-band");
 const offsetRead = need("offset-read");
-const coneLeft = need("offset-cone-left");
-const coneRight = need("offset-cone-right");
+const earLeft = need("offset-left");
+const earRight = need("offset-right");
 const status = need("status");
 
 const scoreCells: Record<EarMode, { hits: HTMLElement; strikes: HTMLElement; rate: HTMLElement }> = {
@@ -412,11 +412,13 @@ function onEarsChange(event: Event): void {
 function renderOffset(): void {
   const degrees = Number(offsetSlider.value);
 
-  // Only the cones move: the ears stay on opposite sides of the head, which is the
-  // difference between an owl and a tilted head. Both rotate the same way about
-  // their own ear, which swings the left cone down and the right one up.
-  coneLeft.setAttribute("transform", `rotate(${-degrees} 62 66)`);
-  coneRight.setAttribute("transform", `rotate(${-degrees} 138 66)`);
+  // Each ear slides to where the skull actually has its opening at full offset,
+  // and its cone rotates about it. The ears never leave the sides of the skull —
+  // that is the difference between an owl and a tilted head, and it has to stay
+  // visible while the slider moves.
+  const drop = (degrees / 25) * 4.45;
+  earLeft.setAttribute("transform", `translate(0 ${drop}) rotate(${-degrees} 61.5 48)`);
+  earRight.setAttribute("transform", `translate(0 ${-drop}) rotate(${-degrees} 137 48)`);
 
   const spread = heightUncertainty(earsWithOffset(degrees), EAR_JITTER_DECIBELS);
 
