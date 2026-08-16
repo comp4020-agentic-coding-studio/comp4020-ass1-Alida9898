@@ -24,7 +24,6 @@ import {
   type Inference,
   isHit,
   itdMicroseconds,
-  HIT_RADIUS,
   randomPrey,
   type RoughHeight,
   roughHeight,
