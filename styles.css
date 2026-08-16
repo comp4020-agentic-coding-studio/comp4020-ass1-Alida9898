@@ -81,6 +81,73 @@ a {
   border-bottom-color: var(--amber);
 }
 
+.nav-bar {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Ships with the `hidden` attribute; nav.ts removes it. See nav.ts for why. */
+.nav-toggle {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem 0.7rem;
+  font: inherit;
+  letter-spacing: inherit;
+  color: var(--muted);
+  text-transform: inherit;
+  cursor: pointer;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+}
+
+.nav-toggle:hover {
+  color: var(--ink);
+  border-color: var(--muted);
+}
+
+.nav-toggle:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.nav-toggle-bars,
+.nav-toggle-bars::before,
+.nav-toggle-bars::after {
+  display: block;
+  width: 1rem;
+  height: 2px;
+  background: currentcolor;
+}
+
+.nav-toggle-bars {
+  position: relative;
+}
+
+.nav-toggle-bars::before,
+.nav-toggle-bars::after {
+  position: absolute;
+  left: 0;
+  content: "";
+}
+
+.nav-toggle-bars::before {
+  top: -5px;
+}
+
+.nav-toggle-bars::after {
+  top: 5px;
+}
+
+/* `.steps` sets display:flex, which beats the UA sheet's [hidden] rule at equal
+   specificity — so without this the hidden attribute does nothing at all. */
+.steps[hidden] {
+  display: none;
+}
+
 .brand {
   color: var(--muted);
   text-decoration: none;
@@ -837,6 +904,32 @@ footer {
 @media (width < 34rem) {
   body {
     padding: 1.5rem 1rem 3rem;
+  }
+
+  /* Opened, the list is a stack of touch targets rather than a row of small
+     ones, and it sits under a rule so it reads as a panel the button opened. */
+
+  .steps {
+    flex-direction: column;
+    gap: 0;
+    margin-top: 0.85rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--line);
+  }
+
+  /* Stacked, a full-width bottom border reads as a divider between items rather
+     than as a mark on one of them. A vertical nav marks the current page down
+     its side. */
+
+  .steps a {
+    display: block;
+    padding: 0.6rem 0 0.6rem 0.7rem;
+    border-bottom: 0;
+    border-left: 2px solid transparent;
+  }
+
+  .steps a[aria-current="page"] {
+    border-left-color: var(--amber);
   }
 
   /* On a phone the field is the page, so give it the width back: the axis words

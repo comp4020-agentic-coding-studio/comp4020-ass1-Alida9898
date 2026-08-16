@@ -201,3 +201,50 @@ describe("diagram labels stay off the skull plates", () => {
     expect(checked, "no diagram labels were found to check").toBeGreaterThan(0);
   });
 });
+
+// The classic hamburger failure is a button that ships visible and does nothing
+// because its script never ran — and it looks completely fine while doing it. So
+// the built markup has to be usable on its own: list showing, button hidden until
+// nav.ts takes responsibility for it. nav.test.ts covers the behaviour; this
+// covers what a visitor gets when there is no behaviour.
+describe("the nav works before its script does", () => {
+  it("ships every page with the list open and the button put away", () => {
+    for (const { name, doc } of pages) {
+      const toggle = doc.querySelector("#nav-toggle");
+      const list = doc.querySelector("#nav-steps");
+
+      expect(toggle, `${name} has no nav toggle`).toBeTruthy();
+      expect(list, `${name} has no nav list for the toggle to control`).toBeTruthy();
+
+      expect(
+        toggle?.hasAttribute("hidden"),
+        `${name} ships the toggle visible; without nav.ts that is a button that does nothing`,
+      ).toBe(true);
+      expect(
+        list?.hasAttribute("hidden"),
+        `${name} ships the nav list hidden, so a visitor with no script has no nav`,
+      ).toBe(false);
+    }
+  });
+
+  it("wires the button to the list it actually controls, and names it", () => {
+    for (const { name, doc } of pages) {
+      const toggle = doc.querySelector("#nav-toggle");
+      const controls = toggle?.getAttribute("aria-controls");
+
+      expect(controls, `${name}'s toggle has no aria-controls`).toBeTruthy();
+      expect(
+        controls == null ? null : doc.getElementById(controls),
+        `${name}'s toggle points aria-controls at "${controls}", which is not on the page`,
+      ).toBeTruthy();
+      expect(
+        toggle?.getAttribute("aria-expanded"),
+        `${name}'s toggle must ship a resolved aria-expanded, not none`,
+      ).toBe("false");
+      expect(
+        (toggle?.textContent ?? "").trim().length,
+        `${name}'s toggle has no accessible name — an icon-only button is unlabelled`,
+      ).toBeGreaterThan(2);
+    }
+  });
+});

@@ -10,8 +10,21 @@
   <body>
     <header>
       <nav aria-label="Primary">
-        <a class="brand" href="./">The owl's uneven ears</a>
-        <ol class="steps">
+        <div class="nav-bar">
+          <a class="brand" href="./">The owl's uneven ears</a>
+          <button
+            class="nav-toggle"
+            id="nav-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="nav-steps"
+            hidden
+          >
+            <span class="nav-toggle-bars" aria-hidden="true"></span>
+            Pages
+          </button>
+        </div>
+        <ol class="steps" id="nav-steps">
             <li><a href="./">Hunt</a></li>
             <li><a href="./how.html">How it works</a></li>
             <li><a href="./why.html" aria-current="page">Why so lopsided</a></li>
@@ -131,5 +144,6 @@
       </p>
     </footer>
     <script type="module" src="./exhibit.ts"></script>
+    <script type="module" src="./nav.ts"></script>
   </body>
 </html>
