@@ -22,8 +22,10 @@ decent game you could win without learning anything, since you wiggle until the
 numbers agree. The obvious fix was a paragraph explaining what nulling meant; I
 threw the mechanic out instead, because if an interaction needs a paragraph to
 mean something, the paragraph is doing the work. I knew the rebuild was better
-because it could be measured without me: 100.0% hit rate with an owl's ears
-against 10.1% with level ones, driven in `spec/levelling.test.ts`.
+because it could be measured without me: the acoustics are a pure module with no
+DOM in it, so the physics is checked independently of anything drawn, and driving
+the page like a visitor gives 100.0% hit rate with an owl's ears against 10.1%
+with level ones (`spec/hunt.test.ts`, `spec/levelling.test.ts`).
 
 [`3d40446...6526d42`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Alida9898/compare/3d40446...6526d42)
 
@@ -61,13 +63,3 @@ also answers the head-tilt objection by construction, since there is nothing lef
 to turn towards. Four tests hold it.
 
 [`2ec0f55`](https://github.com/comp4020-agentic-coding-studio/comp4020-ass1-Alida9898/commit/2ec0f55)
-
-## Where to look
-
-- `CLAUDE.md` — the harness, grown as I hit things; every rule traces to
-  something that happened.
-- `acoustics.ts` — pure, no DOM, so `spec/hunt.test.ts` holds the physics to
-  account independently of anything drawn.
-- `spec/` — 115 tests. The useful ones are contracts a person would otherwise
-  have to remember: no diagram draws a tilted head, the mouse rustles once, the
-  nav works before its script does.
