@@ -714,6 +714,23 @@ footer {
     padding: 1.5rem 1rem 3rem;
   }
 
+  /* On a phone the field is the page, so give it the width back: the axis words
+     go vertical (an axis label's usual posture) and the rig reaches past the
+     body padding — stopping short of the very edge, which belongs to the
+     system's own back-swipe. */
+
+  .rig {
+    grid-template-columns: 1rem 1rem 1fr;
+    gap: 0.25rem;
+    margin-right: -0.5rem;
+    margin-left: -0.5rem;
+  }
+
+  .rig-axis-v span {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+
   .field {
     aspect-ratio: 4 / 3;
   }
