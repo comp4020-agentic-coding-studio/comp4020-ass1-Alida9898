@@ -45,6 +45,62 @@ a {
   color: var(--amber);
 }
 
+/* Three pages, read in order. The nav is a numbered list because the order is
+   part of the argument: you hunt before you are told why it worked. */
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.1rem;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.steps li {
+  counter-increment: step;
+}
+
+.steps a {
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.steps a::before {
+  content: counter(step) " ";
+  opacity: 0.55;
+}
+
+.steps a:hover {
+  color: var(--ink);
+}
+
+.steps a[aria-current="page"] {
+  color: var(--amber);
+  border-bottom-color: var(--amber);
+}
+
+.brand {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.brand:hover {
+  color: var(--amber);
+}
+
+/* The link on to the next page. Sits at the foot of every page so the sequence
+   can be read straight through without going back up to the nav. */
+.onward {
+  margin-top: 2.75rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.95rem;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 /* A barn owl coming out of the dark. Pale because that is what the underside of a
    barn owl looks like from below, which is the only angle a mouse ever gets. */
 
@@ -490,6 +546,21 @@ footer {
   fill: rgb(224 162 68 / 20%);
   stroke: rgb(224 162 68 / 45%);
   stroke-width: 1;
+}
+
+/* Eye sockets, nasal aperture and teeth on the drawn human skull. Dark fill so
+   they read as holes in bone rather than as shapes sitting on top of it. */
+.skull-feature {
+  fill: var(--dark);
+  stroke: var(--muted);
+  stroke-width: 1.4;
+}
+
+.skull-line {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.2;
+  opacity: 0.75;
 }
 
 .diagram-ear {

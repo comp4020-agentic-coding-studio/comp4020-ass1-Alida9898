@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Why so lopsided — The Owl's Uneven Ears</title>
+    <meta name="description" content="Then why not just tilt your head? And why is a barn owl lopsided by so much? Two fair objections, answered." />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header>
+      <nav aria-label="Primary">
+        <a class="brand" href="./">The owl's uneven ears</a>
+        <ol class="steps">
+            <li><a href="./">Hunt</a></li>
+            <li><a href="./how.html">How it works</a></li>
+            <li><a href="./why.html" aria-current="page">Why so lopsided</a></li>
+        </ol>
+      </nav>
+    </header>
+
+    <main>
+      <section aria-labelledby="asking-heading">
+        <h1 id="asking-heading">Two fair objections</h1>
+
+        <h2 class="exhibit-heading">Then why not just tilt your head?</h2>
+
+        <p>
+          Tilt twenty-five degrees and one ear really is higher than the other — the
+          same twenty-five degrees an owl has. But look at <em>what moved</em>. A tilt
+          carries the ear positions round with it, and positions set the timing axis,
+          so both cues turn together and stay parallel. The owl moves only where each
+          ear listens hardest. Timing stays horizontal; loudness swings vertical.
+        </p>
+
+        <p class="pull">
+          Two rulers taped in parallel measure one direction, however you turn the
+          pair. Tilting turns the pair. An owl's skull changes the angle between them.
+        </p>
+
+        <p>
+          Not that tilting is useless — you can tell high from low, just not this way.
+          The folds of your outer ear stamp a sound with the angle it came from, and
+          you can always turn your head and listen twice.
+        </p>
+
+        <p>
+          Both are shut to an owl. Feathers build directionality — that is the facial
+          ruff — but not that fine filtering. And listening twice costs time it has
+          not got: one rustle, then a dive at speed through its own wind noise, prey
+          still moving, no chance to stop and re-aim.
+        </p>
+
+        <p>
+          The asymmetry is not a better answer to the same problem. It is the only
+          answer left to a harder one.
+        </p>
+
+        <h2 class="exhibit-heading">And why lopsided by so much?</h2>
+
+        <p>
+          Working a height out of the loudness difference means dividing by how much
+          that difference moves per unit of height — and that divisor shrinks with the
+          offset. Nearly level, one decibel of slop becomes a wild answer. Slide it
+          down and watch.
+        </p>
+
+        <div class="exhibit">
+          <label class="exhibit-label" for="offset">Vertical offset between the ears</label>
+          <svg
+            class="exhibit-svg"
+            viewBox="0 0 200 132"
+            role="img"
+            aria-labelledby="offset-diagram-title"
+          >
+            <title id="offset-diagram-title">
+              A barn owl skull seen from the front — mirrored left to right so its
+              anatomy matches this page's convention — with a marker on each ear
+              opening and a cone showing where that ear listens hardest. At zero offset
+              the two are level and their cones mirror each other. As the offset grows
+              the left drops and its cone swings down while the right rises and swings
+              up, and the ears stay on opposite sides of the skull throughout.
+            </title>
+            <image
+              class="diagram-skull"
+              href="./owl-skull.webp"
+              x="26"
+              y="6"
+              width="148"
+              height="99"
+              transform="scale(-1, 1) translate(-200, 0)"
+            />
+            <line class="diagram-level" x1="14" y1="48" x2="186" y2="48" />
+            <g id="offset-left">
+              <path class="diagram-cone" d="M 61.5 48 L 16 36 L 16 60 Z" />
+              <ellipse class="diagram-ear" cx="61.5" cy="48" rx="5" ry="7" />
+            </g>
+            <g id="offset-right">
+              <path class="diagram-cone" d="M 137 48 L 184 36 L 184 60 Z" />
+              <ellipse class="diagram-ear" cx="137" cy="48" rx="5" ry="7" />
+            </g>
+          </svg>
+          <input
+            class="exhibit-slider"
+            type="range"
+            id="offset"
+            min="0"
+            max="25"
+            step="1"
+            value="25"
+            aria-describedby="offset-read"
+          />
+          <div class="exhibit-band" aria-hidden="true">
+            <span class="exhibit-band-fill" id="offset-band"></span>
+            <span class="exhibit-band-target"></span>
+          </div>
+          <p class="exhibit-read" id="offset-read"></p>
+        </div>
+      </section>
+
+      <nav class="onward" aria-label="Next">
+        <a href="./">← Back to the hunt</a>
+      </nav>
+    </main>
+
+    <footer>
+      <p>
+        Built for COMP4020. Simplified acoustics; the head diagrams are schematics.
+        Skull illustration: SOURCE TO BE CREDITED — replace this with the origin and
+        licence before submitting.
+      </p>
+    </footer>
+    <script type="module" src="./exhibit.ts"></script>
+  </body>
+</html>

@@ -12,6 +12,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 //
 // So this file loads the SHIPPED markup, executes main.ts against it, and
 // drives the core interaction the way a visitor would.
+//
+// Scope is index.html — the hunt. Since the explainer became three pages, the
+// cross-page structure and the diagram contracts live in pages.test.ts, and the
+// offset exhibit (why.html) in exhibit.test.ts, because each needs a document
+// this file's main.ts import would refuse to run against.
 
 vi.useFakeTimers();
 
@@ -43,80 +48,6 @@ function chooseEars(mode: "uneven" | "level"): void {
 
 beforeEach(() => {
   settle();
-});
-
-// An interactive explainer that explains first is a page with a toy at the bottom.
-// The hunt goes above the theory on purpose, and that ordering is a decision worth
-// pinning: it is invisible to every other check and trivially lost in an edit.
-describe("the page puts the hunt before the explanation", () => {
-  const headings = [...document.querySelectorAll("h2")].map(
-    (heading) => heading.textContent?.trim() ?? "",
-  );
-
-  it("opens with something to do", () => {
-    const hunt = headings.findIndex((text) => /^Hunt$/.test(text));
-    const theory = headings.findIndex((text) => /How the owl does it/.test(text));
-    const payoff = headings.findIndex((text) => /what about you/i.test(text));
-
-    expect(hunt, "no Hunt section in the shipped page").toBeGreaterThanOrEqual(0);
-    expect(theory, "no explanation section in the shipped page").toBeGreaterThanOrEqual(0);
-    expect(
-      hunt,
-      "the explanation came before the hunt; the interaction has to be the hook, not the reward",
-    ).toBeLessThan(theory);
-    expect(theory, "the payoff should land after the mechanism, not before it").toBeLessThan(payoff);
-  });
-});
-
-// The page's whole distinction is that an owl moves where its ears AIM without
-// moving where they SIT — move the positions and you have drawn a tilted head,
-// which is the thing being ruled out. That went wrong in the owl diagram and was
-// caught by eye rather than by anything here, three separate corrections into the
-// same confusion. So it stops being a matter of remembering.
-describe("no diagram draws a tilted head", () => {
-  it("keeps every pair of ear markers level with each other", () => {
-    const diagrams = [...document.querySelectorAll("svg")];
-    let checked = 0;
-
-    for (const diagram of diagrams) {
-      const ears = [...diagram.querySelectorAll(".diagram-ear")];
-      if (ears.length < 2) continue;
-      checked += 1;
-
-      const heights = ears.map((ear) => Number(ear.getAttribute("cy")));
-      const spread = Math.max(...heights) - Math.min(...heights);
-      expect(
-        spread,
-        `a diagram puts its ear markers at ${heights.join(" and ")} — different heights is a tilted head, and a tilt turns the timing cue with it. Only the cones may differ.`,
-      ).toBe(0);
-    }
-
-    expect(checked, "no diagram with a pair of ears was found to check").toBeGreaterThan(0);
-  });
-});
-
-// The invariants give every <img> an alt check, and inline SVG slips straight past
-// it — so the diagrams need their own.
-describe("the diagrams are legible to a screen reader", () => {
-  it("gives each one a real accessible name", () => {
-    const diagrams = [...document.querySelectorAll('svg[role="img"]')];
-    expect(
-      diagrams.length,
-      "expected at least the owl and human diagrams; the count is incidental, the naming below is the contract",
-    ).toBeGreaterThanOrEqual(2);
-
-    for (const diagram of diagrams) {
-      const labelId = diagram.getAttribute("aria-labelledby");
-      expect(labelId, "an inline svg with role=img but no aria-labelledby is an unlabelled image").toBeTruthy();
-
-      const label = labelId === null ? null : document.getElementById(labelId);
-      const described = label?.textContent?.trim() ?? "";
-      expect(
-        described.length,
-        `the diagram's <title> is missing or too thin to describe it: "${described}"`,
-      ).toBeGreaterThan(40);
-    }
-  });
 });
 
 describe("the page wires itself up", () => {
@@ -165,43 +96,6 @@ describe("audio is an addition and never a dependency", () => {
       Number(text("uneven-strikes")),
       "with audio unavailable the hunt still has to work end to end",
     ).toBeGreaterThan(before);
-  });
-});
-
-describe("the offset exhibit answers why so lopsided", () => {
-  function setOffset(degrees: number): void {
-    const slider = document.querySelector<HTMLInputElement>("#offset");
-    if (!slider) throw new Error("no offset slider in the shipped page");
-    slider.value = String(degrees);
-    slider.dispatchEvent(new Event("input"));
-  }
-
-  it("gets worse as the offset shrinks", () => {
-    setOffset(20);
-    const wide = text("offset-read");
-    setOffset(4);
-    const narrow = text("offset-read");
-
-    const widthOf = (reading: string) => Number(/([\d.]+) target widths/.exec(reading)?.[1] ?? "0");
-    expect(widthOf(wide), "no error figure in the readout").toBeGreaterThan(0);
-    expect(
-      widthOf(narrow),
-      "shrinking the offset must make the height worse, or the exhibit is not making its point",
-    ).toBeGreaterThan(widthOf(wide));
-  });
-
-  it("says there is no height at all at zero, rather than quoting a huge number", () => {
-    setOffset(0);
-    expect(
-      text("offset-read"),
-      "at zero offset the height is absent, not merely imprecise; a number here would contradict the rest of the page",
-    ).toMatch(/no height/i);
-  });
-
-  it("labels the slider for anyone not looking at it", () => {
-    const slider = document.querySelector<HTMLInputElement>("#offset");
-    expect(slider?.labels?.[0]?.textContent?.trim().length ?? 0).toBeGreaterThan(5);
-    expect(slider?.getAttribute("aria-describedby")).toBe("offset-read");
   });
 });
 
