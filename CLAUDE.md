@@ -161,6 +161,23 @@ it down here. Growing this file is the work of harness engineering, and the gap
 between this boilerplate and your own version is part of what your prototype
 says about the developer you're becoming.
 
+## Plan before building, when the ask is more than one thing
+
+Phase 1 of the hunt was built as a complete, working mechanic --- you moved your
+aim until two readings cancelled out --- reviewed, and then thrown away whole.
+The scoping plan existed and was good (`PLAN.md`, cut the explainer down to ear
+asymmetry alone). What was missing was a plan for the *interaction*, so the first
+design that got imagined was the first design that got built, and the question
+underneath it --- how does the page show that the owl works the height out in
+advance? --- never got asked until there was working code to argue with.
+
+So: when a request is more than one task, or when the shape of the thing is not
+obvious yet, write the plan first and get it agreed before building. `PLAN.md`
+for anything that outlives the session; a short numbered list in the conversation
+for anything smaller. A plan is cheap to disagree with. A finished mechanic is
+expensive, because disagreeing with it means someone has to accept the work was
+wasted --- which is pressure to keep a bad design rather than admit it.
+
 ## Commit as each piece of work finishes, not at the end of a session
 
 Crit 1 nearly shipped with nothing real behind it: a whole Windows 98 re-skin
@@ -215,8 +232,57 @@ Two checks only a real browser can do, so they do not belong in `pnpm check`:
 - **Colour contrast.** `spec/accessibility.test.ts` runs axe in jsdom, which has
   no layout, so every geometric rule is skipped --- contrast included. `ab a11y`
   runs the same axe in Chrome and does evaluate it. Note that axe cannot measure
-  SVG `<text>` and reports those as *incomplete*; ours were checked by hand at
-  8.6:1 against the page background.
+  SVG `<text>` at all and reports those as *incomplete*, so nothing automatic
+  covers them --- a hand-check goes stale the moment the background moves, which
+  is how amber labels ended up on a cream plate at 1.77:1 after being measured at
+  8.6:1 on the dark. Where the geometry allows it, make the rule positional
+  instead: `spec/pages.test.ts` forbids a label inside a plate's rect.
 - **Both marking viewports.** 1920x1080 and 390x844 each count in full. Check
   that the hunt is reachable without a scroll at 1080 --- an interactive
   explainer whose interaction is below the fold has buried its own point.
+
+## Navigation: collapse it on a phone, and make the collapse survive no JS
+
+Three pages means a nav of three links plus the title. At 390px that fitted on
+one line --- 358px of 390 --- so nothing looked broken. That is exactly why it
+was worth changing: it was spending a whole row of vertical space on the viewport
+that has the least of it, directly above the fold, on the page whose interaction
+has to be reachable without scrolling.
+
+So: more than two or three destinations in a horizontal nav, collapse them behind
+a button below the phone breakpoint. Two traps, both of which look completely
+finished while broken:
+
+- **Ship the button with `hidden` and let the script remove it.** A hamburger
+  that assumes its script ran leaves a button that opens nothing when it did
+  not --- and that failure is invisible, because a dead button looks like a live
+  one. The plain list is the correct no-script state.
+- **Restore the list unconditionally above the breakpoint.** A phone left closed
+  and then rotated past the breakpoint otherwise has no nav at all: the collapsed
+  state is stale and nothing on screen says so. This is found by users, not by
+  you, because you never rotate your own test device mid-session.
+
+Both are pinned in `spec/nav.test.ts` and `spec/pages.test.ts`.
+
+## Facts about this stack that have each cost a run
+
+- **`tsconfig.include` is `["*.ts", "spec"]`.** Modules under `src/` are never
+  typechecked. Entry modules live at the repo root --- that is why `main.ts`,
+  `nav.ts` and `exhibit.ts` are where they are, and moving one "somewhere tidier"
+  silently turns off its types.
+- **jsdom: `document.textContent` is `null`** on a Document node, per the DOM
+  spec. Use `document.body.textContent`. A test that reads the former does not
+  error, it just matches nothing --- so it passes while asserting nothing.
+- **jsdom has neither `matchMedia` nor `<dialog>`'s `showModal`/`close`.** Stub
+  what you need *before* importing the module under test, since a module that
+  reads them at load time has already run by the time your `beforeEach` fires.
+- **`[hidden]` loses to any class that sets `display`.** The UA rule is
+  `display: none` at specificity (0,1,0), so `.steps { display: flex }` beats it
+  and the attribute does nothing at all. Pair every attribute-driven hide with
+  its own `.thing[hidden] { display: none }`.
+- **`filter: invert()` only works on line art.** A tonal drawing inverted is a
+  photographic negative: the darkest thing in it --- eye sockets, holes --- comes
+  out brightest, and no global tone curve fixes it. Print it positive instead.
+  Related: never back a lossy image with a rect in a "matching" colour. The paper
+  survives compression a few levels off and seams against it at a hard edge; bake
+  the margin into the image so there is only one surface.
