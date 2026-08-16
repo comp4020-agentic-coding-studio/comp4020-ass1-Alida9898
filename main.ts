@@ -412,13 +412,12 @@ function onEarsChange(event: Event): void {
 function renderOffset(): void {
   const degrees = Number(offsetSlider.value);
 
-  // Each ear slides to where the skull actually has its opening at full offset,
-  // and its cone rotates about it. The ears never leave the sides of the skull —
-  // that is the difference between an owl and a tilted head, and it has to stay
-  // visible while the slider moves.
-  const drop = (degrees / 25) * 4.45;
-  earLeft.setAttribute("transform", `translate(0 ${drop}) rotate(${-degrees} 61.5 48)`);
-  earRight.setAttribute("transform", `translate(0 ${-drop}) rotate(${-degrees} 137 48)`);
+  // Only the cones turn. The ear markers stay level with each other on opposite
+  // sides of the skull, because moving them apart vertically would draw a tilted
+  // head — which is the one thing this whole section exists to distinguish an owl
+  // from. Jiayi caught that being drawn wrong; the test below now forbids it.
+  earLeft.setAttribute("transform", `rotate(${-degrees} 61.5 48)`);
+  earRight.setAttribute("transform", `rotate(${-degrees} 137 48)`);
 
   const spread = heightUncertainty(earsWithOffset(degrees), EAR_JITTER_DECIBELS);
 

@@ -70,6 +70,33 @@ describe("the page puts the hunt before the explanation", () => {
 
 // The invariants give every <img> an alt check, and inline SVG slips straight past
 // it — so the diagrams need their own.
+// The page's whole distinction is that an owl moves where its ears AIM without
+// moving where they SIT — move the positions and you have drawn a tilted head,
+// which is the thing being ruled out. That went wrong in the owl diagram and was
+// caught by eye rather than by anything here, three separate corrections into the
+// same confusion. So it stops being a matter of remembering.
+describe("no diagram draws a tilted head", () => {
+  it("keeps every pair of ear markers level with each other", () => {
+    const diagrams = [...document.querySelectorAll("svg")];
+    let checked = 0;
+
+    for (const diagram of diagrams) {
+      const ears = [...diagram.querySelectorAll(".diagram-ear")];
+      if (ears.length < 2) continue;
+      checked += 1;
+
+      const heights = ears.map((ear) => Number(ear.getAttribute("cy")));
+      const spread = Math.max(...heights) - Math.min(...heights);
+      expect(
+        spread,
+        `a diagram puts its ear markers at ${heights.join(" and ")} — different heights is a tilted head, and a tilt turns the timing cue with it. Only the cones may differ.`,
+      ).toBe(0);
+    }
+
+    expect(checked, "no diagram with a pair of ears was found to check").toBeGreaterThan(0);
+  });
+});
+
 describe("the diagrams are legible to a screen reader", () => {
   it("gives each one a real accessible name", () => {
     const diagrams = [...document.querySelectorAll('svg[role="img"]')];

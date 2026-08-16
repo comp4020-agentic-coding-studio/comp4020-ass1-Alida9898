@@ -20,3 +20,11 @@ mise.local.toml
 # your course API key, and this repo goes public when you ship. Your tracked
 # harness is CLAUDE.md (and any AGENTS.md), not this directory.
 .claude/
+
+# scratch: an earlier PROCESS.md draft, kept out of the repo
+PROCESS.draft.md
+
+# RStudio scratch
+.Rhistory
+.RData
+.Rproj.user/
