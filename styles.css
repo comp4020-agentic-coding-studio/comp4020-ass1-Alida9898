@@ -536,8 +536,10 @@ footer {
   stroke-width: 2;
 }
 
+/* Crosses both the dark page and the light plates, so it cannot borrow either
+   one's contrast — a mid grey is legible on both and loud on neither. */
 .diagram-level {
-  stroke: var(--line);
+  stroke: rgb(122 130 142 / 60%);
   stroke-width: 1.5;
   stroke-dasharray: 5 5;
 }
@@ -546,21 +548,6 @@ footer {
   fill: rgb(224 162 68 / 20%);
   stroke: rgb(224 162 68 / 45%);
   stroke-width: 1;
-}
-
-/* Eye sockets, nasal aperture and teeth on the drawn human skull. Dark fill so
-   they read as holes in bone rather than as shapes sitting on top of it. */
-.skull-feature {
-  fill: var(--dark);
-  stroke: var(--muted);
-  stroke-width: 1.4;
-}
-
-.skull-line {
-  fill: none;
-  stroke: var(--muted);
-  stroke-width: 1.2;
-  opacity: 0.75;
 }
 
 .diagram-ear {
@@ -612,10 +599,17 @@ footer {
 /* A black-line-on-white scan on a dark page. invert() flips it to white lines on
    black, and screen then drops the black entirely, so only the drawing survives. */
 
+/* The two skulls are printed plates rather than inverted line art. Inverting
+   worked for the owl, which is a line drawing — white paper, black strokes, so
+   invert-and-screen leaves lit strokes on the page's own dark. The human skull is
+   a TONAL drawing, and inverting a tonal drawing is a photographic negative: the
+   eye sockets, the darkest thing in it, come out as the brightest, which reads as
+   an X-ray and puts the holes in the wrong polarity. No global tone curve fixes
+   that — paper and sockets sit at opposite ends and both have to go dark while
+   the bone between them goes light. Printing both positive on their own paper is
+   the honest way to show either. */
 .diagram-skull {
-  filter: invert(1);
-  mix-blend-mode: screen;
-  opacity: 0.95;
+  clip-path: inset(0 round 3px);
 }
 
 /* Lighter inside the exhibit than in the static diagrams: here the skull is the
