@@ -204,6 +204,11 @@ Three things that cost time the first run:
   answers `Unknown command`. Same for `device` and `media`.
 - **`set viewport` needs a `reload`** before the screenshot, or you photograph
   the old layout.
+- **`ab click <selector>` has silently done nothing** where
+  `ab eval "document.querySelector('…').click()"` worked. A no-op click looks
+  exactly like a page that ignored the click, so it is worth reaching for `eval`
+  before concluding the page is broken --- prefer it when a click is load-bearing
+  evidence.
 
 Two checks only a real browser can do, so they do not belong in `pnpm check`:
 
